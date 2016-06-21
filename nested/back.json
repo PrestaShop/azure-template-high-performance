@@ -1,0 +1,301 @@
+{
+  "$schema":"https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion":"1.0.0.0",
+  "parameters":{
+    "adminUsername":{
+      "type":"string",
+      "metadata":{
+        "description":"Username for the Ansible Control Virtual Machine and provisoning"
+      }
+    },
+    "sshKeyData":{
+      "type":"string",
+      "metadata":{
+        "description":"Public key for SSH authentication"
+      }
+    },
+    "ubuntuOSVersion":{
+      "type":"string",
+      "metadata":{
+        "description":"The Ubuntu version for the VM."
+      }
+    },
+    "bkVmSize":{
+      "type":"string",
+      "metadata":{
+        "description":"Instance size for Web Back VMs"
+      }
+    },
+    "numberOfBack":{
+      "type":"int",
+      "metadata":{
+        "description":"Number of Back nodes to create >=2"
+      }
+    },
+    "bkAvailabilitySetName":{
+      "type":"string",
+      "metadata":{
+        "description":"Name of the availability Set"
+      }
+    },
+    "bkStorageAccountName":{
+      "type":"string",
+      "metadata":{
+        "description":"Storage Account name"
+      }
+    },
+    "bkStorageAccountType":{
+      "type":"string",
+      "metadata":{
+        "description":"Account type"
+      }
+    },
+    "subnetCIDR":{
+      "type":"string",
+      "metadata":{
+        "description":"Subnet Suffix"
+      }
+    },
+    "bkSubnetRoot":{
+      "type":"string"
+    },
+    "bkSubnetName":{
+      "type":"string",
+      "metadata":{
+        "description":"Subnet Name"
+      }
+    },
+    "bkSubnetPrefix":{
+      "type":"string",
+      "metadata":{
+        "description":"Subnet IP block"
+      }
+    },
+    "vnetID":{
+      "type":"string",
+      "metadata":{
+        "description":"vnet ID"
+      }
+    },
+    "bkVmName":{
+      "type":"string",
+      "metadata":{
+        "description":"Basename of back VMs"
+      }
+    },
+    "shopSize":{
+      "type":"string",
+      "metadata":{
+        "description":"T-shirt size of the PrestaShop cluster"
+      }
+    },
+    "keyStorageAccountName":{
+      "type":"string",
+      "metadata":{
+        "description":"Storage account name for keys"
+      }
+    }
+  },
+  "variables":{
+    "bkVmStorageAccountContainerName":"vhds",
+    "sshKeyPath":"[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
+    "dnsserver":"8.8.8.8",
+    "location":"[resourceGroup().location]",
+    "imagePublisher":"Canonical",
+    "imageOffer":"UbuntuServer",
+    "bkOSDiskName":"bkosdisk",
+    "bkDataDiskName":"bkdatadisk",
+    "keyStorageAccountType":"Standard_LRS",
+    "bkNicName":"bkVnic",
+    "bkPublicIPAddressName":"bkPublicIP",
+    "bkPublicIPAddressType":"Dynamic",
+    "bkSubnetRef":"[concat(parameters('vnetID'),'/subnets/',parameters('bkSubnetName'))]",
+    "scriptsBaseUrl":"https://raw.githubusercontent.com/herveleclerc/arm-lamp/master/scripts/",
+    "customScriptDeployFile":"deploy-back.sh",
+    "customScriptDeployUrl":"[concat(variables('scriptsBaseUrl'),variables('customScriptDeployFile'))]",
+    "customScriptBackCommand":"[concat('bash ',variables('customScriptDeployFile'))]",
+    "pythonAzureScriptUrl":"[concat(variables('scriptsBaseUrl'),'GetSSHFromPrivateStorage.py')]",
+    "apiVersion":{
+      "resources":{
+        "deployments":"2015-01-01"
+      },
+      "network":"2015-05-01-preview",
+      "storage":"2015-05-01-preview",
+      "compute":"2015-06-15"
+    },
+    "shopSizeSmall": {
+      "ddSizeFront": 127,
+      "ddSizeBack": 127
+    },
+    "shopSizeMedium": {
+      "ddSizeFront": 127,
+      "ddSizeBack": 511
+    },
+    "shopSizeLarge": {
+      "ddSizeFront": 127,
+      "ddSizeBack": 1023
+    },
+    "clusterSpec": "[variables(concat('shopSize', parameters('shopSize')))]"
+  },
+  "resources":[
+    {
+      "comments":"Global Storage Account for the back VM",
+      "type":"Microsoft.Storage/storageAccounts",
+      "name":"[toLower(parameters('bkStorageAccountName'))]",
+      "apiVersion":"[variables('apiVersion').storage]",
+      "location":"[variables('location')]",
+      "properties":{
+        "accountType":"[parameters('bkStorageAccountType')]"
+      }
+    },
+    {
+      "comments":"LOOP Interface for Back VMs",
+      "apiVersion":"[variables('apiVersion').network]",
+      "type":"Microsoft.Network/networkInterfaces",
+      "name":"[concat(variables('bkNicName'), copyindex())]",
+      "location":"[variables('location')]",
+      "copy":{
+        "name":"bkNicLoop",
+        "count":"[parameters('numberOfBack')]"
+      },
+      "dependsOn":[
+      ],
+      "properties":{
+        "dnsSettings":{
+          "dnsServers": []
+        },
+        "ipConfigurations":[
+          {
+            "name":"bkipconfig",
+            "properties":{
+              "privateIPAllocationMethod":"Static",
+              "privateIPAddress":"[concat(parameters('bkSubnetRoot'), '.',add(copyindex(),4) )]",
+              "subnet":{
+                "id":"[variables('bkSubnetRef')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "comments":"Custom script extension for the Back VMs",
+      "type":"Microsoft.Compute/virtualMachines/extensions",
+      "name":"[concat(parameters('bkVmName'),copyindex(),'/installBack')]",
+      "apiVersion":"[variables('apiVersion').compute]",
+      "location":"[resourceGroup().location]",
+      "copy":{
+        "name":"bkExtLoop",
+        "count":"[parameters('numberOfBack')]"
+      },
+      "dependsOn":[
+        "[concat('Microsoft.Compute/virtualMachines/', parameters('bkVmName'),copyindex())]"
+      ],
+      "properties":{
+        "publisher":"Microsoft.OSTCExtensions",
+        "type":"CustomScriptForLinux",
+        "typeHandlerVersion":"1.4",
+        "autoUpgradeMinorVersion": true,
+        "settings":{
+          "fileUris":[
+            "[variables('customScriptDeployUrl')]",
+            "[variables('pythonAzureScriptUrl')]"
+          ]
+        },
+        "protectedSettings":{
+          "commandToExecute":"[concat(variables('customScriptBackCommand'),' \"', parameters('keyStorageAccountName'),'\" \"',listKeys(concat('Microsoft.Storage/storageAccounts/', parameters('keyStorageAccountName')), '2015-05-01-preview').key1,'\" \"',parameters('adminUsername'),'\" \"',parameters('numberOfBack'),'\" \"',parameters('bkSubnetRoot'),'\" \"',parameters('bkVmName'),'\"')]"
+        }
+      }
+    },
+    {
+      "comments":"VM back provisoned",
+      "apiVersion":"[variables('apiVersion').compute]",
+      "type":"Microsoft.Compute/virtualMachines",
+      "name":"[concat(parameters('bkVmName'),copyindex())]",
+      "location":"[variables('location')]",
+      "copy":{
+        "name":"bkVmLoop",
+        "count":"[parameters('numberOfBack')]"
+      },
+      "dependsOn":[
+        "[concat('Microsoft.Storage/storageAccounts/', toLower(parameters('bkStorageAccountName')) ) ]",
+        "[concat('Microsoft.Network/networkInterfaces/', variables('bkNicName'),copyindex())]"
+      ],
+      "properties":{
+        "availabilitySet":{
+          "id":"[resourceId('Microsoft.Compute/availabilitySets', parameters('bkAvailabilitySetName'))]"
+        },
+        "hardwareProfile":{
+          "vmSize":"[parameters('bkVmSize')]"
+        },
+        "osProfile":{
+          "computerName":"[concat(parameters('bkVmName'),copyindex())]",
+          "adminUsername":"[parameters('adminUsername')]",
+          "linuxConfiguration":{
+            "disablePasswordAuthentication":"true",
+            "ssh":{
+              "publicKeys":[
+                {
+                  "path":"[variables('sshKeyPath')]",
+                  "keyData":"[parameters('sshKeyData')]"
+                }
+              ]
+            }
+          }
+        },
+        "storageProfile":{
+          "imageReference":{
+            "publisher":"[variables('imagePublisher')]",
+            "offer":"[variables('imageOffer')]",
+            "sku":"[parameters('ubuntuOSVersion')]",
+            "version":"latest"
+          },
+          "osDisk":{
+            "name":"[concat(parameters('bkVmName'), copyindex())]",
+            "vhd":{
+              "uri":"[concat(reference(concat('Microsoft.Storage/storageAccounts/', parameters('bkStorageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).primaryEndpoints.blob, variables('bkVmStorageAccountContainerName'),'/', variables('bkOSDiskName'),copyindex(), '.vhd')]"
+            },
+            "caching":"ReadWrite",
+            "createOption":"FromImage"
+          },
+          
+          "dataDisks": [
+            {
+              "name": "datadisk0",
+              "diskSizeGB": "[variables('clusterSpec').ddSizeBack]",
+              "lun": 0,
+              "caching": "None",
+              "createOption": "Empty",
+              "vhd": {
+                "uri": "[concat('http://', parameters('bkStorageAccountName'), '.blob.core.windows.net/', variables('bkVmStorageAccountContainerName'), '/', parameters('bkVmName'), '-data0', copyindex(), '.vhd')]"
+              }
+            },
+            {
+              "name": "datadisk1",
+              "diskSizeGB": "[variables('clusterSpec').ddSizeBack]",
+              "lun": 1,
+              "caching": "None",
+              "createOption": "Empty",
+              "vhd": {
+                "uri": "[concat('http://', parameters('bkStorageAccountName'), '.blob.core.windows.net/', variables('bkVmStorageAccountContainerName'), '/', parameters('bkVmName'), '-data1', copyindex(), '.vhd')]"
+              }
+            }
+          ]
+        },
+        "networkProfile":{
+          "networkInterfaces":[
+            {
+              "id":"[resourceId('Microsoft.Network/networkInterfaces',concat(variables('bkNicName'),copyindex() ) )]"
+            }
+          ]
+        },
+        "diagnosticsProfile":{
+          "bootDiagnostics":{
+            "enabled":"true",
+            "storageUri":"[concat(reference(concat('Microsoft.Storage/storageAccounts/', parameters('bkStorageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).primaryEndpoints.blob)]"
+          }
+        }
+      }
+    }
+  ]
+}

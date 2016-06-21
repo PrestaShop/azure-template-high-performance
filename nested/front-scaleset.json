@@ -1,0 +1,479 @@
+ {
+  "$schema":"http://schema.management.azure.com/schemas/2015-01-01-preview/deploymentTemplate.json",
+  "contentVersion":"1.0.0.0",
+  "parameters":{
+    "adminUsername":{
+      "type":"string",
+      "metadata":{
+        "description":"Username for the Ansible Control Virtual Machine and provisoning"
+      }
+    },
+    "sshKeyData":{
+      "type":"string",
+      "metadata":{
+        "description":"Public key for SSH authentication"
+      }
+    },
+    "ubuntuOSVersion":{
+      "type":"string",
+      "metadata":{
+        "description":"The Ubuntu version for the VM."
+      }
+    },
+
+    "scVmSize":{
+      "type":"string",
+      "metadata":{
+        "description":"Instance size for Web Front VMs"
+      }
+    },
+
+    "scPublicIPAddressName":{
+      "type":"string",
+      "metadata":{
+        "description":"frPublicIP"
+      }
+    },
+
+    "scStorageAccountName":{
+      "type":"string",
+      "metadata":{
+        "description":"Storage Account name"
+      }
+    },
+    "scStorageAccountType":{
+      "type":"string",
+      "metadata":{
+        "description":"Account type"
+      }
+    },
+    "subnetCIDR":{
+      "type":"string",
+      "metadata":{
+        "description":"Subnet Suffix"
+      }
+    },
+    "scSubnetRoot":{
+      "type":"string"
+    },
+    "scSubnetName":{
+      "type":"string",
+      "metadata":{
+        "description":"Subnet Name"
+      }
+    },
+    "scSubnetPrefix":{
+      "type":"string",
+      "metadata":{
+        "description":"Subnet IP block"
+      }
+    },
+    "vnetID":{
+      "type":"string",
+      "metadata":{
+        "description":"vnet ID"
+      }
+    },
+    "scVmName":{
+      "type":"string",
+      "metadata":{
+        "description":"Basename of front VMs"
+      }
+    },
+
+    "dnsNameForFrontPublicIP":{
+      "type":"string",
+      "metadata":{
+        "description":"LB Name"
+      }
+    },
+
+
+
+
+
+
+    
+    "vmssName":{
+      "type":"string",
+      "defaultValue": "techvnode",
+      "metadata":{
+        "description":"String used as a base for naming resources (9 characters or less). A hash is prepended to this string for some resources, and resource-specific information is appended."
+      },
+      "maxLength":9
+    },
+
+    "instanceCount":{
+      "type":"int",
+      "defaultValue":"2",
+      "metadata":{
+        "description":"Number of VM instances (100 or less)."
+      },
+      "maxValue":100
+    }
+  },
+  "variables":{
+    "location":"[resourceGroup().location]",
+     
+    
+    "saCount":5,
+    "newStorageAccountSuffix":"[concat(parameters('vmssName'), 'sa')]",
+    "uniqueStringArray":[
+      "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), '0')))]",
+      "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), '1')))]",
+      "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), '2')))]",
+      "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), '3')))]",
+      "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), '4')))]"
+    ],
+    "sshKeyPath": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
+    "vhdContainerName":"[concat(parameters('vmssName'), 'vhd')]",
+    "osDiskName":"[concat(parameters('vmssName'), 'osdisk')]",
+  
+   
+    
+    
+    
+    
+    
+   
+    
+    "nicName":"[concat(parameters('vmssName'), 'nic')]",
+    "ipConfigName":"[concat(parameters('vmssName'), 'ipconfig')]",
+   
+   
+    
+    "osType":{
+      "publisher":"Canonical",
+      "offer":"UbuntuServer",
+      "sku":"[parameters('ubuntuOSVersion')]",
+      "version":"latest"
+    },
+
+    "frLBName":"[concat('lb', resourceGroup().name)]",
+    "lbPublicIPAddressID":"[resourceId('Microsoft.Network/publicIPAddresses',parameters('scPublicIPAddressName'))]",
+    "lbID":"[resourceId('Microsoft.Network/loadBalancers',variables('frLBName'))]",
+    "lbProbeID": "[concat(variables('lbID'),'/probes/tcpProbe')]",
+    "lbPoolID": "[concat(variables('lbID'),'/backendAddressPools/LoadBalancerBackend')]",
+    "frontEndIPConfigID":"[concat(variables('lbID'),'/frontendIPConfigurations/loadBalancerFrontend')]",
+
+    "scPublicIPAddressType":"Dynamic",
+
+    "apiVersion":{
+      "resources":{
+        "deployments":"2015-01-01"
+      },
+      "network":"2015-05-01-preview",
+      "storage":"2015-05-01-preview",
+      "compute":"2015-06-15"
+    }
+
+
+
+    "imageReference":"[variables('osType')]"
+  },
+  "resources":[
+    {
+      "comments":"OK: Load Balancer Definition for Front ScaleSet VM",
+      "apiVersion":"[variables('apiVersion').compute]",
+      "name":"[variables('frLBName')]",
+      "type":"Microsoft.Network/loadBalancers",
+      "location":"[variables('location')]",
+      "dependsOn":[
+        "[concat('Microsoft.Network/publicIPAddresses/', parameters('scPublicIPAddressName'))]"
+      ],
+      "properties":{
+        "frontendIPConfigurations":[
+          {
+            "name":"LoadBalancerFrontend",
+            "properties":{
+              "publicIPAddress":{
+                "id":"[variables('lbPublicIPAddressID')]"
+              }
+            }
+          }
+        ],
+        "backendAddressPools":[
+          {
+            "name":"LoadBalancerBackend"
+          }
+        ],
+        "loadBalancingRules": [
+          {
+            "name": "LBRuleHttp",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[variables('frontEndIPConfigID')]"
+              },
+              "backendAddressPool": {
+                "id": "[variables('lbPoolID')]"
+              },
+              "protocol": "Tcp",
+              "frontendPort": 80,
+              "backendPort": 80,
+              "enableFloatingIP": false,
+              "idleTimeoutInMinutes": 5,
+              "loadDistribution": "SourceIP",
+              "probe": {
+                "id": "[variables('lbProbeID')]"
+              }
+            }
+          },
+          {
+            "name": "LBRuleHttps",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[variables('frontEndIPConfigID')]"
+              },
+              "backendAddressPool": {
+                "id": "[variables('lbPoolID')]"
+              },
+              "protocol": "Tcp",
+              "frontendPort": 443,
+              "backendPort": 443,
+              "enableFloatingIP": false,
+              "idleTimeoutInMinutes": 5,
+              "loadDistribution": "SourceIP",
+              "probe": {
+                "id": "[variables('lbProbeID')]"
+              }
+            }
+          }
+        ],
+        "probes": [
+          {
+            "name": "tcpProbe",
+            "properties": {
+              "protocol": "tcp",
+              "port": 80,
+              "intervalInSeconds": 5,
+              "numberOfProbes": 2
+            }
+          }
+        ]
+      }
+    },
+    {
+      "comments":"OK: Global Storage Account for the front scaleset VM",
+      "type":"Microsoft.Storage/storageAccounts",
+      "name":"[concat(variables('uniqueStringArray')[copyIndex()], toLower(parameters('scStorageAccountName'))   )]",
+      "apiVersion":"[variables('apiVersion').storage]",
+      "copy":{
+        "name":"storageLoop",
+        "count":"[variables('saCount')]"
+      },
+      "properties":{
+        "accountType":"[parameters('scStorageAccountType')]"
+      }
+    },
+    {
+      "comments":"OK: Public IP for Front Load Balancer",
+      "apiVersion":"[variables('apiVersion').network]",
+      "type":"Microsoft.Network/publicIPAddresses",
+      "name":"[parameters('scPublicIPAddressName')]",
+      "location":"[variables('location')]",
+      "properties":{
+        "publicIPAllocationMethod":"[variables('scPublicIPAddressType')]",
+        "dnsSettings":{
+          "domainNameLabel":"[parameters('dnsNameForFrontPublicIP')]"
+        }
+      }
+    },
+
+  
+
+
+
+
+    {
+      "type":"Microsoft.Compute/virtualMachineScaleSets",
+      "name":"[parameters('vmssName')]",
+      "location":"[parameters('resourceLocation')]",
+      "apiVersion":"[variables('apiVersion')]",
+      "dependsOn":[
+        "[concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[0], variables('newStorageAccountSuffix'))]",
+        "[concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[1], variables('newStorageAccountSuffix'))]",
+        "[concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[2], variables('newStorageAccountSuffix'))]",
+        "[concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[3], variables('newStorageAccountSuffix'))]",
+        "[concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[4], variables('newStorageAccountSuffix'))]",
+        "[concat('Microsoft.Network/loadBalancers/', variables('frLBName'))]"
+      ],
+      "sku":{
+        "name":"[parameters('vmSku')]",
+        "tier":"Standard",
+        "capacity":"[parameters('instanceCount')]"
+      },
+      "properties":{
+        "upgradePolicy":{
+          "mode":"Manual"
+        },
+        "virtualMachineProfile":{
+          "storageProfile":{
+            "osDisk":{
+              "vhdContainers":[
+                "[concat('https://', variables('uniqueStringArray')[0], variables('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]",
+                "[concat('https://', variables('uniqueStringArray')[1], variables('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]",
+                "[concat('https://', variables('uniqueStringArray')[2], variables('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]",
+                "[concat('https://', variables('uniqueStringArray')[3], variables('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]",
+                "[concat('https://', variables('uniqueStringArray')[4], variables('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]"
+              ],
+              "name":"[variables('osDiskName')]",
+              "caching":"ReadOnly",
+              "createOption":"FromImage"
+            },
+            "imageReference":"[variables('imageReference')]"
+          },
+          "osProfile": {
+            "computerNamePrefix":"[parameters('vmssName')]",
+            "adminUsername": "[parameters('adminUsername')]",
+            "linuxConfiguration": {
+              "disablePasswordAuthentication": "true",
+              "ssh": {
+                "publicKeys": [
+                  {
+                    "path": "[variables('sshKeyPath')]",
+                    "keyData": "[parameters('sshKeyData')]"
+                  }
+                ]
+              }
+            }
+          },
+          "networkProfile":{
+            "networkInterfaceConfigurations":[
+              {
+                "name":"[variables('nicName')]",
+                "properties":{
+                  "primary":"true",
+                  "ipConfigurations":[
+                    {
+                      "name":"[variables('ipConfigName')]",
+                      "properties":{
+                        "subnet":{
+                          "id":"[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'), '/subnets/', variables('subnetName'))]"
+                        },
+                        "loadBalancerBackendAddressPools":[
+                          {
+                            "id":"[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', variables('loadBalancerName'), '/backendAddressPools/', variables('bePoolName'))]"
+                          }
+                        ],
+                        "loadBalancerInboundNatPools":[
+                          {
+                            "id":"[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', variables('loadBalancerName'), '/inboundNatPools/', variables('natPoolName'))]"
+                          },
+                          {
+                            "id": "[variables('natCratePoolID')]"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "extensionProfile": {
+            "extensions": [
+              {
+                "name":"lapextension",
+                "properties":{
+                  "publisher":"Microsoft.OSTCExtensions",
+                  "type":"CustomScriptForLinux",
+                  "typeHandlerVersion":"1.3",
+                  "autoUpgradeMinorVersion":true,
+                  "settings":{
+                    "fileUris":[
+                      "https://raw.githubusercontent.com/herveleclerc/TechDaysCampDemo/master/ubuntu-vmss/deploy.sh",
+                      "https://raw.githubusercontent.com/herveleclerc/TechDaysCampDemo/master/ubuntu-vmss/crate-setup.yml"
+                    ],  
+                    "commandToExecute": "[concat('bash deploy.sh ', 'unknown', ' ', parameters('instanceCount') )]"
+                  }
+                }
+              },
+              {
+                "name": "LinuxDiagnostic",
+                "properties": {
+                  "publisher": "Microsoft.OSTCExtensions",
+                  "type": "LinuxDiagnostic",
+                  "typeHandlerVersion": "2.2",
+                  "autoUpgradeMinorVersion": true,
+                  "settings": {
+                    "xmlCfg": "[base64(concat(variables('wadcfgxstart'),variables('wadmetricsresourceid'),variables('wadcfgxend')))]",
+                    "storageAccount": "[variables('diagnosticsStorageAccountName')]"
+                  },
+                  "protectedSettings": {
+                    "storageAccountName": "[variables('diagnosticsStorageAccountName')]",
+                    "storageAccountKey": "[listkeys(variables('accountid'), variables('apiVersion')).key1]",
+                    "storageAccountEndPoint": "https://core.windows.net"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Insights/autoscaleSettings",
+      "apiVersion":"2015-04-01",
+      "name": "autoscalewah",
+      "location":"[parameters('resourceLocation')]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('vmSSName'))]"
+      ],
+      "properties": {
+        "name": "autoscalewah",
+        "targetResourceUri": "[concat('/subscriptions/',subscription().subscriptionId, '/resourceGroups/',  resourceGroup().name, '/providers/Microsoft.Compute/virtualMachineScaleSets/', parameters('vmSSName'))]",
+        "enabled": true,
+        "profiles": [
+          {
+            "name": "Profile1",
+            "capacity": {
+              "minimum": "2",
+              "maximum": "10",
+              "default": "2"
+            },
+            "rules": [
+              {
+                "metricTrigger": {
+                  "metricName": "\\Processor\\PercentProcessorTime",
+                  "metricNamespace": "",
+                  "metricResourceUri": "[concat('/subscriptions/',subscription().subscriptionId, '/resourceGroups/',  resourceGroup().name, '/providers/Microsoft.Compute/virtualMachineScaleSets/', parameters('vmSSName'))]",
+                  "timeGrain": "PT1M",
+                  "statistic": "Average",
+                  "timeWindow": "PT5M",
+                  "timeAggregation": "Average",
+                  "operator": "GreaterThan",
+                  "threshold": 50.0
+                },
+                "scaleAction": {
+                  "direction": "Increase",
+                  "type": "ChangeCount",
+                  "value": "1",
+                  "cooldown": "PT1M"
+                }
+              },
+              {
+                "metricTrigger":{
+                  "metricName":"\\Processor\\PercentProcessorTime",
+                  "metricNamespace":"",
+                  "metricResourceUri":"[concat('/subscriptions/',subscription().subscriptionId, '/resourceGroups/',  resourceGroup().name, '/providers/Microsoft.Compute/virtualMachineScaleSets/', parameters('vmSSName'))]",
+                  "timeGrain":"PT1M",
+                  "statistic":"Average",
+                  "timeWindow":"PT5M",
+                  "timeAggregation":"Average",
+                  "operator":"LessThan",
+                  "threshold":20.0
+                },
+                "scaleAction":{
+                  "direction":"Decrease",
+                  "type":"ChangeCount",
+                  "value":"1",
+                  "cooldown":"PT1M"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
