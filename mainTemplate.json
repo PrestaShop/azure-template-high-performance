@@ -1,0 +1,598 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": { 
+    "templatesBaseURL":{
+      "type":"string",
+      "metadata": {
+        "description":"Base template URL for nested template",
+        "artifactsBaseUrl": ""
+      },
+      "defaultValue": "https://raw.githubusercontent.com/PrestaShop/azure-template-high-performance/master"
+    },
+    "dnsNameForAnsiblePublicIP":{
+      "type":"string",
+      "metadata":{
+        "description":"Dns Name for Jumpbox VM"
+      }
+    },
+    "dnsNameForScPublicIP":{
+      "type":"string",
+      "metadata":{
+        "description":"Public IP address for Jumpbox VM"
+      }
+    },
+    "hcPublicIPAddressName":{
+      "type":"string",
+      "defaultValue": "hcPublicIP", 
+      "metadata":{
+        "description":"Public IP address Name for Jumpbox VM"
+      }
+    },
+    "scPublicIPAddressName":{
+      "type":"string",
+      "defaultValue": "scPublicIP", 
+      "metadata":{
+        "description":"Public IP address Name for web-front scaleset load balancer VM"
+      }
+    },
+
+   "dnsNameForFrontPublicIP":{
+      "type":"string",
+      "metadata":{
+        "description":"Public IP address for web-front LB "
+      }
+    },
+  
+    "adminUserName":{
+      "type":"string",
+      "metadata":{
+        "description":"Username for the Ansible Control Virtual Machine"
+      },
+      "defaultValue":"pr35745h0p"
+    },
+    "authenticationType": {
+      "type": "string",
+      "allowedValues": [
+        "password",
+        "sshPublicKey"
+      ]
+    },
+    "hcPassword": {
+      "type": "securestring",
+      "defaultValue": "", 
+      "metadata": {
+        "description": "Password for the Virtual Machine. Not used if authenticationType of sshPublicKey."
+      }
+    },
+    "sshKeyData":{
+      "type":"string",
+      "metadata":{
+        "description":"SSH RSA public key file as a string. Not used if authenticationType of password."
+      }
+    },
+    "instanceCount":{
+      "type":"int",
+      "defaultValue":"2",
+      "metadata":{
+        "description":"Number of VM instances (100 or less)."
+      },
+      "maxValue":100
+    },
+    "hcVmSize":{
+      "type":"string",
+      "defaultValue":"Standard_DS1",
+      "metadata":{
+        "description":"Instance size for JumpBox VMs"
+      }
+    },
+    "scVmSize":{
+      "type":"string",
+      "defaultValue":"Standard_DS1",
+      "metadata":{
+        "description":"Instance size for Web Front ScaleSet VMs"
+      }
+    },
+    "bkVmSize":{
+      "type":"string",
+      "defaultValue":"Standard_DS1",
+      "metadata":{
+        "description":"Instance size for Web Front VMs Minimum Standard_A2"
+      }
+    },
+    "numberOfBack":{
+      "type":"int",
+      "defaultValue":2,
+      "metadata":{
+        "description":"Number of Back nodes to create >=2"
+      }
+    },
+    "hcStorageAccountName":{
+      "type":"string",
+      "metadata": {
+        "description":"Storage Account Name for JumpBox"
+      }
+    },
+    "hcStorageAccountType": {
+      "type": "string",
+      "defaultValue": "Premium_LRS",
+      "metadata":{
+        "description":"Storage Account type for hc VMs"
+      }
+    }, 
+   "scStorageAccountType": {
+      "type": "string",
+      "defaultValue": "Premium_LRS",
+      "metadata":{
+        "description":"Storage Account type for Front VMs"
+      }
+    },
+    "bkStorageAccountType": {
+      "type": "string",
+      "defaultValue": "Premium_LRS",
+      "metadata":{
+        "description":"Storage Account type for Back VMs"
+      }
+    },
+    "hcNetworkSecurityGroupName":{
+      "type":"string",
+      "metadata": {
+        "description":"Network Security group for Jumpbox"
+      },
+      "defaultValue": "hcSecurityGroup"
+    },
+    "scNetworkSecurityGroupName":{
+      "type":"string",
+      "metadata": {
+        "description":"Network Security group for web-front scaleset"
+      },
+      "defaultValue": "scSecurityGroup"
+    },
+    "bkNetworkSecurityGroupName":{
+      "type":"string",
+      "metadata": {
+        "description":"Network Security group for Back"
+      },
+      "defaultValue": "bkSecurityGroup"
+    },
+    "shopSize": {
+      "type": "string",
+      "defaultValue": "Small",
+      "allowedValues": [
+        "Small",
+        "Medium",
+        "Large"
+      ],
+      "metadata": {
+        "description": "T-shirt size of the PrestaShop cluster"
+      }
+    },
+    "prestashop_firstname":{
+      "type":"string",
+      "metadata":{
+        "description":"Prestatshop Admin Firstname"
+      }
+    },
+    "prestashop_lastname":{
+      "type":"string",
+      "metadata":{
+        "description":"Prestatshop Admin Lastname"
+      }
+    },
+    "prestashop_email":{
+      "type":"string",
+      "metadata":{
+        "description":"Prestatshop Admin email"
+      }
+    },
+    "prestashop_password":{
+      "type":"securestring",
+      "metadata":{
+        "description":"Prestatshop Admin Password"
+      }
+    },
+    "hcSubnetPrefix":{
+      "type":"string",
+      "metadata": {
+        "description":"Control VM Subnet Prefix"
+      },
+      "defaultValue": "10.0.0.0/24"
+    },
+    "scSubnetPrefix":{
+      "type":"string",
+      "metadata": {
+        "description":"Front Subnet Prefix"
+      },
+      "defaultValue": "10.0.2.0/24"
+    },
+    "bkSubnetPrefix":{
+      "type":"string",
+      "metadata": {
+        "description":"Back Subnet Prefix"
+      },
+      "defaultValue": "10.0.4.0/24"
+    },
+    "virtualNetworkName":{
+      "type":"string",
+      "metadata": {
+        "description":"Virtual Network Name"
+      },
+      "defaultValue": "vnet-prestashop"
+    },
+    "addressPrefix":{
+      "type":"string",
+      "metadata": {
+        "description":"Virtual Network address Prefix"
+      },
+      "defaultValue": "10.0.0.0/16"
+    },
+    "hcSubnetName":{
+      "type":"string",
+      "metadata": {
+        "description":"Name of Jumpbox subnet"
+      },
+      "defaultValue": "hc-subnet"
+    },
+    "scSubnetName":{
+      "type":"string",
+      "metadata": {
+        "description":"Name of Front ScaleSet subnet"
+      },
+      "defaultValue": "front-subnet"
+    },
+    "bkSubnetName":{
+      "type":"string",
+      "metadata": {
+        "description":"Name of Back subnet"
+      },
+      "defaultValue": "back-subnet"
+    },
+    "scStorageAccountName":{
+      "type":"string",
+      "metadata": {
+        "description":"Storage Account Name for Front Scale Set VMs"
+      }
+    },
+    "bkStorageAccountName":{
+      "type":"string",
+      "metadata": {
+        "description":"Storage Account Name for Back VMs"
+      }
+    }
+  },
+  "variables": { 
+    "configuration":{
+      "sharTemplateURL":"[concat(parameters('templatesBaseURL'),'/nested/sharedRes.json')]",
+      "jumpTemplateURL":"[concat(parameters('templatesBaseURL'),'/nested/jumpbox.json')]",
+      "scfrTemplateURL":"[concat(parameters('templatesBaseURL'),'/nested/front-scaleset.json')]",
+      "backTemplateURL":"[concat(parameters('templatesBaseURL'),'/nested/back.json')]"
+    },
+    "dnsserver":"8.8.8.8",
+    "location":"[resourceGroup().location]",
+    "imagePublisher":"Canonical",
+    "imageOffer":"UbuntuServer",
+    "ubuntuOSVersion":"16.04.0-LTS",
+    "hcOSDiskName":"hcosdisk",
+    "keyStorageAccountName":"[concat('key', uniquestring(resourceGroup().id, deployment().name))]",
+    "keyStorageAccountType":"Standard_LRS",
+    "hcNicName":"hcVnic",
+    "apiVersion":{
+      "resources":{
+        "deployments":"2015-01-01"
+      },
+      "network":"2015-05-01-preview",
+      "storage":"2015-05-01-preview",
+      "compute":"2015-06-15",
+      "deployment":"2016-02-01"
+    },
+    
+    "scPublicIPAddressType":"Dynamic",
+    "frLBName":"[concat('lb', resourceGroup().name)]",
+
+    "hcSubnetRoot":"[concat( split(parameters('hcSubnetPrefix'), '.')[0], '.', split(parameters('hcSubnetPrefix'), '.')[1], '.', split(parameters('hcSubnetPrefix'), '.')[2])]",
+    "scSubnetRoot":"[concat( split(parameters('scSubnetPrefix'), '.')[0], '.', split(parameters('scSubnetPrefix'), '.')[1], '.', split(parameters('scSubnetPrefix'), '.')[2])]",
+    "bkSubnetRoot":"[concat( split(parameters('bkSubnetPrefix'), '.')[0], '.', split(parameters('bkSubnetPrefix'), '.')[1], '.', split(parameters('bkSubnetPrefix'), '.')[2])]"
+    
+
+  },
+  "resources": [ 
+    { "comments": "OK: Shared resource deployment",
+      "name":"FrontDeployment",
+      "type":"Microsoft.Resources/deployments",
+      "apiVersion":"[variables('apiVersion').deployment]",
+      "dependsOn":[],
+      "properties":{
+        "mode":"Incremental",
+        "templateLink":{
+          "uri":"[variables('configuration').sharTemplateURL]",
+          "contentVersion":"1.0.0.0"
+        },
+       "parameters":{
+          "hcStorageAccountName":{
+            "value":"[parameters('hcStorageAccountName')]"
+          },
+          "hcStorageAccountType":{
+            "value":"[parameters('hcStorageAccountType')]"
+          },
+          "hcPublicIPAddressName":{
+            "value":"[parameters('hcPublicIPAddressName')]"
+          },
+          "dnsNameForAnsiblePublicIP":{
+            "value":"[parameters('dnsNameForAnsiblePublicIP')]"
+          },
+          "virtualNetworkName":{
+            "value":"[parameters('virtualNetworkName')]"
+          },
+          "addressPrefix":{
+            "value":"[parameters('addressPrefix')]"
+          },
+          "hcSubnetName":{
+            "value":"[parameters('hcSubnetName')]"
+          },
+          "hcSubnetPrefix":{
+            "value":"[parameters('hcSubnetPrefix')]"
+          },
+          "scSubnetName":{
+            "value":"[parameters('scSubnetName')]"
+          },
+          "scSubnetPrefix":{
+            "value":"[parameters('scSubnetPrefix')]"
+          },
+          "hcNetworkSecurityGroupName":{
+            "value":"[parameters('hcNetworkSecurityGroupName')]"
+          },
+          "bkNetworkSecurityGroupName":{
+            "value":"[parameters('bkNetworkSecurityGroupName')]"
+          },
+          "scNetworkSecurityGroupName":{
+            "value":"[parameters('scNetworkSecurityGroupName')]"
+          },
+          "scStorageAccountName":{
+            "value":"[parameters('scStorageAccountName')]"
+          },
+          "bkStorageAccountName":{
+            "value":"[parameters('bkStorageAccountName')]"
+          },
+          "scStorageAccountType":{
+            "value":"[parameters('scStorageAccountType')]"
+          },
+          "bkStorageAccountType":{
+            "value":"[parameters('bkStorageAccountType')]"
+          },
+          "instanceCount":{
+            "value":"[parameters('instanceCount')]"
+          },
+          "scPublicIPAddressName":{
+            "value":"[parameters('scPublicIPAddressName')]"
+          },
+          "scPublicIPAddressType":{
+            "value":"[variables('scPublicIPAddressType')]"
+          },
+          "frLBName":{
+            "value":"[variables('frLBName')]"
+          },
+          "bkSubnetName":{
+            "value":"[parameters('bkSubnetName')]"
+          },
+          "bkSubnetPrefix":{
+            "value":"[parameters('bkSubnetPrefix')]"
+          },
+          "dnsNameForFrontPublicIP": {
+             "value":"[parameters('dnsNameForFrontPublicIP')]"
+          }
+        }
+      }
+    },
+
+    {
+      "comments": "TODO: Jumpbox resource deployment",
+      "name":"JumpBoxDeployment",
+      "type":"Microsoft.Resources/deployments",
+      "apiVersion":"[variables('apiVersion').deployment]",
+      "dependsOn":[
+        "[concat('Microsoft.Storage/storageAccounts/', toLower(variables('keyStorageAccountName')))]",
+        "[concat('Microsoft.Network/networkSecurityGroups/',parameters('hcNetworkSecurityGroupName'))]",
+        "[concat('Microsoft.Network/virtualNetworks/',parameters('virtualNetworkName'))]"
+      ],
+      "properties":{
+        "mode":"Incremental",
+        "templateLink":{
+          "uri":"[variables('configuration').jumpTemplateURL]",
+          "contentVersion":"1.0.0.0"
+        },
+        "parameters":{
+          "adminUserName":{
+            "value":"[parameters('adminUserName')]"
+          },
+          "sshKeyData":{
+            "value":"[parameters('sshKeyData')]"
+          },
+          "ubuntuOSVersion":{
+            "value":"[variables('ubuntuOSVersion')]"
+          },
+          "hcVmSize":{
+            "value":"[parameters('hcVmSize')]"
+          },
+          "hcStorageAccountName":{
+            "value":"[parameters('hcStorageAccountName')]"
+          },
+          "bkStorageAccountType":{
+            "value":"[parameters('bkStorageAccountType')]"
+          },
+          "subnetCIDR":{
+            "value":"[variables('subnetCIDR')]"
+          },
+          "bkSubnetRoot":{
+            "value":"[variables('bkSubnetRoot')]"
+          },
+          "bkSubnetName":{
+            "value":"[parameters('bkSubnetName')]"
+          },
+          "bkSubnetPrefix":{
+            "value":"[parameters('bkSubnetPrefix')]"
+          },
+          "vnetID":{
+            "value":"[variables('vnetID')]"
+          },
+          "bkVmName":{
+            "value":"[variables('bkVmName')]"
+          },
+          "shopSize":{
+            "value":"[parameters('shopSize')]"
+          },
+          "keyStorageAccountName":{
+            "value":"[variables('keyStorageAccountName')]"
+          }
+        }
+      }
+    }
+
+
+
+
+
+
+
+    {"comments": "TODO: Scale set front deployment resource",
+      "name":"FrontDeployment",
+      "type":"Microsoft.Resources/deployments",
+      "apiVersion":"[variables('apiVersion').deployment]",
+      "dependsOn":[
+        "[concat('Microsoft.Storage/storageAccounts/', toLower(variables('keyStorageAccountName')))]",
+        "[concat('Microsoft.Network/networkSecurityGroups/',parameters('scNetworkSecurityGroupName'))]",
+        "[concat('Microsoft.Network/virtualNetworks/',parameters('virtualNetworkName'))]"
+      ],
+      "properties":{
+        "mode":"Incremental",
+        "templateLink":{
+          "uri":"[variables('configuration').frontTemplateURL]",
+          "contentVersion":"1.0.0.0"
+        },
+        "parameters":{
+          "adminUserName":{
+            "value":"[parameters('adminUserName')]"
+          },
+          "sshKeyData":{
+            "value":"[parameters('sshKeyData')]"
+          },
+          "ubuntuOSVersion":{
+            "value":"[variables('ubuntuOSVersion')]"
+          },
+          "frVmSize":{
+            "value":"[parameters('frVmSize')]"
+          },
+          "numberOfFront":{
+            "value":"[parameters('numberOfFront')]"
+          },
+          "frAvailabilitySetName":{
+            "value":"[variables('frAvailabilitySetName')]"
+          },
+          "frStorageAccountName":{
+            "value":"[parameters('frStorageAccountName')]"
+          },
+          "frStorageAccountType":{
+            "value":"[parameters('frStorageAccountType')]"
+          },
+          "subnetCIDR":{
+            "value":"[variables('subnetCIDR')]"
+          },
+          "frSubnetRoot":{
+            "value":"[variables('frSubnetRoot')]"
+          },
+          "frSubnetName":{
+            "value":"[parameters('frSubnetName')]"
+          },
+          "frSubnetPrefix":{
+            "value":"[parameters('frSubnetPrefix')]"
+          },
+          "vnetID":{
+            "value":"[variables('vnetID')]"
+          },
+          "frVmName":{
+            "value":"[variables('frVmName')]"
+          },
+          "dnsNameForFrontPublicIP": {
+             "value":"[parameters('dnsNameForFrontPublicIP')]"
+          },
+          "frPublicIPAddressName": {
+            "value":"[parameters('frPublicIPAddressName')]"
+          },
+          "shopSize":{
+            "value":"[parameters('shopSize')]"
+          },
+          "keyStorageAccountName":{
+            "value":"[variables('keyStorageAccountName')]"
+          }
+        }
+      }
+    },
+    {
+      "name":"BackDeployment",
+      "type":"Microsoft.Resources/deployments",
+      "apiVersion":"[variables('apiVersion').deployment]",
+      "dependsOn":[
+        "[concat('Microsoft.Storage/storageAccounts/', toLower(variables('keyStorageAccountName')))]",
+        "[concat('Microsoft.Network/networkSecurityGroups/',variables('bkNetworkSecurityGroupName'))]",
+        "[concat('Microsoft.Network/virtualNetworks/',parameters('virtualNetworkName'))]"
+      ],
+      "properties":{
+        "mode":"Incremental",
+        "templateLink":{
+          "uri":"[variables('configuration').backTemplateURL]",
+          "contentVersion":"1.0.0.0"
+        },
+        "parameters":{
+          "adminUserName":{
+            "value":"[parameters('adminUserName')]"
+          },
+          "sshKeyData":{
+            "value":"[parameters('sshKeyData')]"
+          },
+          "ubuntuOSVersion":{
+            "value":"[variables('ubuntuOSVersion')]"
+          },
+          "bkVmSize":{
+            "value":"[parameters('bkVmSize')]"
+          },
+          "numberOfBack":{
+            "value":"[parameters('numberOfFront')]"
+          },
+          "bkAvailabilitySetName":{
+            "value":"[variables('bkAvailabilitySetName')]"
+          },
+          "bkStorageAccountName":{
+            "value":"[parameters('bkStorageAccountName')]"
+          },
+          "bkStorageAccountType":{
+            "value":"[parameters('bkStorageAccountType')]"
+          },
+          "subnetCIDR":{
+            "value":"[variables('subnetCIDR')]"
+          },
+          "bkSubnetRoot":{
+            "value":"[variables('bkSubnetRoot')]"
+          },
+          "bkSubnetName":{
+            "value":"[parameters('bkSubnetName')]"
+          },
+          "bkSubnetPrefix":{
+            "value":"[parameters('bkSubnetPrefix')]"
+          },
+          "vnetID":{
+            "value":"[variables('vnetID')]"
+          },
+          "bkVmName":{
+            "value":"[variables('bkVmName')]"
+          },
+          "shopSize":{
+            "value":"[parameters('shopSize')]"
+          },
+          "keyStorageAccountName":{
+            "value":"[variables('keyStorageAccountName')]"
+          }
+        }
+      }
+    },
+  ],
+  "outputs": { }
+}

@@ -87,7 +87,6 @@
         "description":"LB Name"
       }
     },
-
     "instanceCount":{
       "type":"int",
       "defaultValue":"2",
@@ -95,31 +94,30 @@
         "description":"Number of VM instances (100 or less)."
       },
       "maxValue":100
+    },
+    "frLBName":{
+      "type":"string",
+      "metadata":{
+        "description":"Name of the LB"
+      }
+    },
+    "templatesBaseURL":{
+      "type":"string",
+      "metadata": {
+        "description":"Base template URL",
+        "artifactsBaseUrl": ""
+      }
     }
   },
   "variables":{
     "location":"[resourceGroup().location]",
-     
-    
-    "saCount":5,
     "newStorageAccountSuffix":"[concat(parameters('scVmName'), 'sa')]",
     "nicName":"[concat(parameters('scVmName'), 'nic')]",
     "ipConfigName":"[concat(parameters('scVmName'), 'ipconfig')]",
-
-    "uniqueStringArray":[
-      "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), '0')))]",
-      "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), '1')))]",
-      "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), '2')))]",
-      "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), '3')))]",
-      "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), '4')))]"
-    ],
     "sshKeyPath": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
-
     "vhdContainerName":"[concat(parameters('scVmName'), 'vhd')]",
     "osDiskName":"[concat(parameters('scVmName'), 'osdisk')]",
-  
-    
-    
+    "storageAccountEndPoint":"https://core.windows.net",
     "osType":{
       "publisher":"Canonical",
       "offer":"UbuntuServer",
@@ -127,17 +125,25 @@
       "version":"latest"
     },
     "imageReference":"[variables('osType')]",
-
-    "frLBName":"[concat('lb', resourceGroup().name)]",
-    "lbPublicIPAddressID":"[resourceId('Microsoft.Network/publicIPAddresses',parameters('scPublicIPAddressName'))]",
-    "lbID":"[resourceId('Microsoft.Network/loadBalancers',variables('frLBName'))]",
-    "lbProbeID": "[concat(variables('lbID'),'/probes/tcpProbe')]",
-    "lbPoolID": "[concat(variables('lbID'),'/backendAddressPools/LoadBalancerBackend')]",
-    "frontEndIPConfigID":"[concat(variables('lbID'),'/frontendIPConfigurations/loadBalancerFrontend')]",
-
     "scSubnetRef":"[concat(parameters('vnetID'),'/subnets/',parameters('scSubnetName'))]",
+    "diagnosticsStorageAccountName":"[concat(variables('uniqueStringArray')[0], parameters('scStorageAccountName'))]",
+    "diagnosticsStorageAccountResourceGroup": "[resourceGroup().name]",
+    "accountid": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',variables('diagnosticsStorageAccountResourceGroup'),'/providers/','Microsoft.Storage/storageAccounts/', variables('diagnosticsStorageAccountName'))]",
+    "wadlogs": "<WadCfg><DiagnosticMonitorConfiguration>",
+    "wadperfcounters1": "<PerformanceCounters scheduledTransferPeriod=\"PT1M\"><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\AvailableMemory\" sampleRate=\"PT15S\" unit=\"Bytes\"><annotation displayName=\"Memory available\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\PercentAvailableMemory\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"Mem. percent available\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\UsedMemory\" sampleRate=\"PT15S\" unit=\"Bytes\"><annotation displayName=\"Memory used\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\PercentUsedMemory\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"Memory percentage\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\PercentUsedByCache\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"Mem. used by cache\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Processor\\PercentIdleTime\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"CPU idle time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Processor\\PercentUserTime\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"CPU user time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Processor\\PercentProcessorTime\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"CPU percentage guest OS\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Processor\\PercentIOWaitTime\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"CPU IO wait time\" locale=\"en-us\"/></PerformanceCounterConfiguration>",
+    "wadperfcounters2": "<PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\BytesPerSecond\" sampleRate=\"PT15S\" unit=\"BytesPerSecond\"><annotation displayName=\"Disk total bytes\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\ReadBytesPerSecond\" sampleRate=\"PT15S\" unit=\"BytesPerSecond\"><annotation displayName=\"Disk read guest OS\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\WriteBytesPerSecond\" sampleRate=\"PT15S\" unit=\"BytesPerSecond\"><annotation displayName=\"Disk write guest OS\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\TransfersPerSecond\" sampleRate=\"PT15S\" unit=\"CountPerSecond\"><annotation displayName=\"Disk transfers\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\ReadsPerSecond\" sampleRate=\"PT15S\" unit=\"CountPerSecond\"><annotation displayName=\"Disk reads\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\WritesPerSecond\" sampleRate=\"PT15S\" unit=\"CountPerSecond\"><annotation displayName=\"Disk writes\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\AverageReadTime\" sampleRate=\"PT15S\" unit=\"Seconds\"><annotation displayName=\"Disk read time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\AverageWriteTime\" sampleRate=\"PT15S\" unit=\"Seconds\"><annotation displayName=\"Disk write time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\AverageTransferTime\" sampleRate=\"PT15S\" unit=\"Seconds\"><annotation displayName=\"Disk transfer time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\AverageDiskQueueLength\" sampleRate=\"PT15S\" unit=\"Count\"><annotation displayName=\"Disk queue length\" locale=\"en-us\"/></PerformanceCounterConfiguration></PerformanceCounters>",
+    "wadcfgxstart": "[concat(variables('wadlogs'),variables('wadperfcounters1'),variables('wadperfcounters2'),'<Metrics resourceId=\"')]",
+    "wadmetricsresourceid": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name ,'/providers/','Microsoft.Compute/virtualMachineScaleSets/',parameters('scVmName'))]",
+    "wadcfgxend": "[concat('\"><MetricAggregation scheduledTransferPeriod=\"PT1H\"/><MetricAggregation scheduledTransferPeriod=\"PT1M\"/></Metrics></DiagnosticMonitorConfiguration></WadCfg>')]",
 
-    "scPublicIPAddressType":"Dynamic",
+    "uniqueStringArray":[
+      "[concat(uniqueString(concat(resourceGroup().id, parameters('scStorageAccountName'), '0')))]",
+      "[concat(uniqueString(concat(resourceGroup().id, parameters('scStorageAccountName'), '1')))]",
+      "[concat(uniqueString(concat(resourceGroup().id, parameters('scStorageAccountName'), '2')))]",
+      "[concat(uniqueString(concat(resourceGroup().id, parameters('scStorageAccountName'), '3')))]",
+      "[concat(uniqueString(concat(resourceGroup().id, parameters('scStorageAccountName'), '4')))]"
+    ],
+    "lbID":"[resourceId('Microsoft.Network/loadBalancers',parameters('frLBName'))]",
 
     "apiVersion":{
       "resources":{
@@ -146,143 +152,22 @@
       "network":"2015-05-01-preview",
       "storage":"2015-05-01-preview",
       "compute":"2015-06-15"
-    },
-
-    "diagnosticsStorageAccountName":"[concat(variables('uniqueStringArray')[0], variables('newStorageAccountSuffix'))]",
-    "diagnosticsStorageAccountResourceGroup": "[resourceGroup().name]",
-    "accountid": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',variables('diagnosticsStorageAccountResourceGroup'),'/providers/','Microsoft.Storage/storageAccounts/', variables('diagnosticsStorageAccountName'))]",
-    "wadlogs": "<WadCfg><DiagnosticMonitorConfiguration>",
-    "wadperfcounters1": "<PerformanceCounters scheduledTransferPeriod=\"PT1M\"><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\AvailableMemory\" sampleRate=\"PT15S\" unit=\"Bytes\"><annotation displayName=\"Memory available\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\PercentAvailableMemory\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"Mem. percent available\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\UsedMemory\" sampleRate=\"PT15S\" unit=\"Bytes\"><annotation displayName=\"Memory used\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\PercentUsedMemory\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"Memory percentage\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\PercentUsedByCache\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"Mem. used by cache\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Processor\\PercentIdleTime\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"CPU idle time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Processor\\PercentUserTime\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"CPU user time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Processor\\PercentProcessorTime\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"CPU percentage guest OS\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Processor\\PercentIOWaitTime\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"CPU IO wait time\" locale=\"en-us\"/></PerformanceCounterConfiguration>",
-    "wadperfcounters2": "<PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\BytesPerSecond\" sampleRate=\"PT15S\" unit=\"BytesPerSecond\"><annotation displayName=\"Disk total bytes\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\ReadBytesPerSecond\" sampleRate=\"PT15S\" unit=\"BytesPerSecond\"><annotation displayName=\"Disk read guest OS\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\WriteBytesPerSecond\" sampleRate=\"PT15S\" unit=\"BytesPerSecond\"><annotation displayName=\"Disk write guest OS\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\TransfersPerSecond\" sampleRate=\"PT15S\" unit=\"CountPerSecond\"><annotation displayName=\"Disk transfers\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\ReadsPerSecond\" sampleRate=\"PT15S\" unit=\"CountPerSecond\"><annotation displayName=\"Disk reads\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\WritesPerSecond\" sampleRate=\"PT15S\" unit=\"CountPerSecond\"><annotation displayName=\"Disk writes\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\AverageReadTime\" sampleRate=\"PT15S\" unit=\"Seconds\"><annotation displayName=\"Disk read time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\AverageWriteTime\" sampleRate=\"PT15S\" unit=\"Seconds\"><annotation displayName=\"Disk write time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\AverageTransferTime\" sampleRate=\"PT15S\" unit=\"Seconds\"><annotation displayName=\"Disk transfer time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\AverageDiskQueueLength\" sampleRate=\"PT15S\" unit=\"Count\"><annotation displayName=\"Disk queue length\" locale=\"en-us\"/></PerformanceCounterConfiguration></PerformanceCounters>",
-    "wadcfgxstart": "[concat(variables('wadlogs'),variables('wadperfcounters1'),variables('wadperfcounters2'),'<Metrics resourceId=\"')]",
-    "wadmetricsresourceid": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name ,'/providers/','Microsoft.Compute/virtualMachineScaleSets/',parameters('scVmName'))]",
-    "wadcfgxend": "[concat('\"><MetricAggregation scheduledTransferPeriod=\"PT1H\"/><MetricAggregation scheduledTransferPeriod=\"PT1M\"/></Metrics></DiagnosticMonitorConfiguration></WadCfg>')]"
+    }
   },
   "resources":[
-    {
-      "comments":"OK: Load Balancer Definition for Front ScaleSet VM",
-      "apiVersion":"[variables('apiVersion').compute]",
-      "name":"[variables('frLBName')]",
-      "type":"Microsoft.Network/loadBalancers",
-      "location":"[variables('location')]",
-      "dependsOn":[
-        "[concat('Microsoft.Network/publicIPAddresses/', parameters('scPublicIPAddressName'))]"
-      ],
-      "properties":{
-        "frontendIPConfigurations":[
-          {
-            "name":"LoadBalancerFrontend",
-            "properties":{
-              "publicIPAddress":{
-                "id":"[variables('lbPublicIPAddressID')]"
-              }
-            }
-          }
-        ],
-        "backendAddressPools":[
-          {
-            "name":"LoadBalancerBackend"
-          }
-        ],
-        "loadBalancingRules": [
-          {
-            "name": "LBRuleHttp",
-            "properties": {
-              "frontendIPConfiguration": {
-                "id": "[variables('frontEndIPConfigID')]"
-              },
-              "backendAddressPool": {
-                "id": "[variables('lbPoolID')]"
-              },
-              "protocol": "Tcp",
-              "frontendPort": 80,
-              "backendPort": 80,
-              "enableFloatingIP": false,
-              "idleTimeoutInMinutes": 5,
-              "loadDistribution": "SourceIP",
-              "probe": {
-                "id": "[variables('lbProbeID')]"
-              }
-            }
-          },
-          {
-            "name": "LBRuleHttps",
-            "properties": {
-              "frontendIPConfiguration": {
-                "id": "[variables('frontEndIPConfigID')]"
-              },
-              "backendAddressPool": {
-                "id": "[variables('lbPoolID')]"
-              },
-              "protocol": "Tcp",
-              "frontendPort": 443,
-              "backendPort": 443,
-              "enableFloatingIP": false,
-              "idleTimeoutInMinutes": 5,
-              "loadDistribution": "SourceIP",
-              "probe": {
-                "id": "[variables('lbProbeID')]"
-              }
-            }
-          }
-        ],
-        "probes": [
-          {
-            "name": "tcpProbe",
-            "properties": {
-              "protocol": "tcp",
-              "port": 80,
-              "intervalInSeconds": 5,
-              "numberOfProbes": 2
-            }
-          }
-        ]
-      }
-    },
-    {
-      "comments":"OK: Global Storage Account for the front scaleset VM",
-      "type":"Microsoft.Storage/storageAccounts",
-      "name":"[concat(variables('uniqueStringArray')[copyIndex()], toLower(parameters('scStorageAccountName'))   )]",
-      "apiVersion":"[variables('apiVersion').storage]",
-      "copy":{
-        "name":"storageLoop",
-        "count":"[variables('saCount')]"
-      },
-      "properties":{
-        "accountType":"[parameters('scStorageAccountType')]"
-      }
-    },
-    {
-      "comments":"OK: Public IP for Front Load Balancer",
-      "apiVersion":"[variables('apiVersion').network]",
-      "type":"Microsoft.Network/publicIPAddresses",
-      "name":"[parameters('scPublicIPAddressName')]",
-      "location":"[variables('location')]",
-      "properties":{
-        "publicIPAllocationMethod":"[variables('scPublicIPAddressType')]",
-        "dnsSettings":{
-          "domainNameLabel":"[parameters('dnsNameForFrontPublicIP')]"
-        }
-      }
-    },
-
-  
-
-
-
-
-    {
+    
+    { "comments":"OK: ScaleSet Definition",
       "type":"Microsoft.Compute/virtualMachineScaleSets",
       "name":"[parameters('scVmName')]",
       "location":"[variables('location')]",
       "apiVersion":"[variables('apiVersion')]",
       "dependsOn":[
-        "[concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[0], variables('newStorageAccountSuffix'))]",
-        "[concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[1], variables('newStorageAccountSuffix'))]",
-        "[concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[2], variables('newStorageAccountSuffix'))]",
-        "[concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[3], variables('newStorageAccountSuffix'))]",
-        "[concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[4], variables('newStorageAccountSuffix'))]",
-        "[concat('Microsoft.Network/loadBalancers/', variables('frLBName'))]"
+        "[concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[0], parameters('scStorageAccountName'))]",
+        "[concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[1], parameters('scStorageAccountName'))]",
+        "[concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[2], parameters('scStorageAccountName'))]",
+        "[concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[3], parameters('scStorageAccountName'))]",
+        "[concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[4], parameters('scStorageAccountName'))]",
+        "[concat('Microsoft.Network/loadBalancers/', parameters('frLBName'))]"
       ],
       "sku":{
         "name":"[parameters('scVmSize')]",
@@ -356,19 +241,14 @@
                 "properties":{
                   "publisher":"Microsoft.OSTCExtensions",
                   "type":"CustomScriptForLinux",
-                  "typeHandlerVersion":"1.3",
+                  "typeHandlerVersion":"1.5",
                   "autoUpgradeMinorVersion":true,
                   "settings":{
                     "fileUris":[
-                      
-                      
-                      "https://raw.githubusercontent.com/herveleclerc/TechDaysCampDemo/master/ubuntu-vmss/deploy.sh",
-                      "https://raw.githubusercontent.com/herveleclerc/TechDaysCampDemo/master/ubuntu-vmss/crate-setup.yml"
-
-
-
+                      "[concat(parameters('templatesBaseURL'),'/scripts/deploy.sh')]",
+                      "[concat(parameters('templatesBaseURL'),'/scripts/deploy.yml')]"
                     ],  
-                    "commandToExecute": "[concat('bash deploy.sh ', 'unknown', ' ', parameters('instanceCount') )]"
+                    "commandToExecute": "[concat('/bin/bash deploy.sh ', parameters('instanceCount') )]"
                   }
                 }
               },
@@ -386,7 +266,7 @@
                   "protectedSettings": {
                     "storageAccountName": "[variables('diagnosticsStorageAccountName')]",
                     "storageAccountKey": "[listkeys(variables('accountid'), variables('apiVersion')).key1]",
-                    "storageAccountEndPoint": "https://core.windows.net"
+                    "storageAccountEndPoint": "[variables('storageAccountEndPoint')]"
                   }
                 }
               }
@@ -396,6 +276,7 @@
       }
     },
     {
+      "comments":"OK: Autoscaling Definition",
       "type": "Microsoft.Insights/autoscaleSettings",
       "apiVersion":"2015-04-01",
       "name": "autoscalewah",

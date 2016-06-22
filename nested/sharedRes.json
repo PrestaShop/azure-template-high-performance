@@ -1,0 +1,464 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "hcStorageAccountName":{
+      "type":"string",
+      "metadata": {
+        "description":"Storage Account Name for JumpBox"
+      }
+    },
+    "hcStorageAccountType":{
+      "type":"string",
+      "metadata":{
+        "description":"Storage Account type for hc VMs"
+      }
+    },
+    "hcPublicIPAddressName":{
+      "type":"string",
+      "defaultValue": "hcPublicIP", 
+      "metadata":{
+        "description":"Public IP address Name for Jumpbox VM"
+      }
+    },
+    "dnsNameForAnsiblePublicIP":{
+      "type":"string",
+      "defaultValue": "hcPublicIP", 
+      "metadata":{
+        "description":"DNS Name for Jumpbox VM"
+      }
+    },
+    "virtualNetworkName":{
+      "type":"string",
+      "metadata": {
+        "description":"Virtual Network Name"
+      }
+    },
+    "addressPrefix":{
+      "type":"string",
+      "metadata": {
+        "description":"Virtual Network address Prefix"
+      }
+    },
+    "hcSubnetName":{
+      "type":"string",
+      "metadata": {
+        "description":"Name of Jumpbox subnet"
+      }
+    },
+    "hcSubnetPrefix":{
+      "type":"string",
+      "metadata": {
+        "description":"Control VM Subnet Prefix"
+      }
+    },
+    "scSubnetName":{
+      "type":"string",
+      "metadata": {
+        "description":"Name of web-front scaleset subnet"
+      }
+    },
+    "scSubnetPrefix":{
+      "type":"string",
+      "metadata": {
+        "description":"web-front scaleset Subnet Prefix"
+      }
+    },
+    "hcNetworkSecurityGroupName":{
+      "type":"string",
+      "metadata": {
+        "description":"Network Security group for Jumpbox"
+      },
+      "defaultValue": "hcSecurityGroup"
+    },
+    "bkNetworkSecurityGroupName":{
+      "type":"string",
+      "metadata": {
+        "description":"Network Security group for Back"
+      },
+      "defaultValue": "bkSecurityGroup"
+    },
+    "scNetworkSecurityGroupName":{
+      "type":"string",
+      "metadata": {
+        "description":"Network Security group for web-front scaleset"
+      },
+      "defaultValue": "scSecurityGroup"
+    },
+    "scStorageAccountName":{
+      "type":"string",
+      "metadata": {
+        "description":"Storage Account Name Prefix for web-front scale set"
+      }
+    },
+    "bkStorageAccountName":{
+      "type":"string",
+      "metadata": {
+        "description":"Storage Account Name Prefix for back VMs"
+      }
+    },
+    "scStorageAccountType": {
+      "type": "string",
+      "defaultValue": "Premium_LRS",
+      "metadata":{
+        "description":"Storage Account type for Front VMs"
+      }
+    },
+    "bkStorageAccountType": {
+      "type": "string",
+      "defaultValue": "Premium_LRS",
+      "metadata":{
+        "description":"Storage Account type for Back VMs"
+      }
+    },
+    "instanceCount":{
+      "type":"int",
+      "defaultValue":"2",
+      "metadata":{
+        "description":"Number of VM instances (100 or less)."
+      },
+      "maxValue":100
+    },
+    "scPublicIPAddressName":{
+      "type":"string",
+      "defaultValue": "scPublicIP", 
+      "metadata":{
+        "description": "Public IP address Name for web-front scaleset load balancer VM"
+      }
+    },
+    "scPublicIPAddressType":{
+      "type":"string",
+      "metadata":{
+        "description":"Type of front LB IP"
+      }
+    },
+    "frLBName":{
+      "type":"string",
+      "metadata":{
+        "description":"Name of the LB"
+      }
+    },
+    "bkSubnetName":{
+      "type":"string",
+      "metadata": {
+        "description":"Name of back subnet"
+      }
+    },
+    "bkSubnetPrefix":{
+      "type":"string",
+      "metadata": {
+        "description":"back Subnet Prefix"
+      }
+    },
+    "dnsNameForFrontPublicIP":{
+      "type":"string",
+      "metadata":{
+        "description":"Public IP address for web-front LB "
+      }
+    } 
+  },
+  "variables": {
+    "bkAvailabilitySetName":"[concat('bkAv', resourceGroup().name)]",
+    "bkFaultDomainCount":"2",
+    "bkUpdateDomainCount":"3",
+    "scSaCount":5,
+    "keyStorageAccountName":"[concat('key', uniquestring(resourceGroup().id, deployment().name))]",
+    "keyStorageAccountType":"Standard_LRS",
+    "hcPublicIPAddressType":"Dynamic",
+    "location":"[resourceGroup().location]",
+    "apiVersion":{
+      "resources":{
+        "deployments":"2015-01-01"
+      },
+      "network":"2015-05-01-preview",
+      "storage":"2015-05-01-preview",
+      "compute":"2015-06-15",
+      "deployment":"2016-02-01"
+    },
+    "uniqueStringArray":[
+      "[concat(uniqueString(concat(resourceGroup().id, parameters('scStorageAccountName'), '0')))]",
+      "[concat(uniqueString(concat(resourceGroup().id, parameters('scStorageAccountName'), '1')))]",
+      "[concat(uniqueString(concat(resourceGroup().id, parameters('scStorageAccountName'), '2')))]",
+      "[concat(uniqueString(concat(resourceGroup().id, parameters('scStorageAccountName'), '3')))]",
+      "[concat(uniqueString(concat(resourceGroup().id, parameters('scStorageAccountName'), '4')))]"
+    ],
+    "lbPublicIPAddressID":"[resourceId('Microsoft.Network/publicIPAddresses',parameters('scPublicIPAddressName'))]",
+    "lbID":"[resourceId('Microsoft.Network/loadBalancers',parameters('frLBName'))]",
+    "lbProbeID": "[concat(variables('lbID'),'/probes/tcpProbe')]",
+    "lbPoolID": "[concat(variables('lbID'),'/backendAddressPools/LoadBalancerBackend')]",
+    "frontEndIPConfigID":"[concat(variables('lbID'),'/frontendIPConfigurations/loadBalancerFrontend')]"
+   },
+  "resources": [
+    { "comments":"OK: Availability Set for Back VMs",
+      "type": "Microsoft.Compute/availabilitySets",
+      "name": "[variables('bkAvailabilitySetName')]",
+      "apiVersion": "[variables('apiVersion').network]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "PlatformFaultDomainCount": "[variables('bkFaultDomainCount')]",
+        "PlatformUpdateDomainCount": "[variables('bkUpdateDomainCount')]"
+      }
+    },
+    { "comments":"OK: Network Security Group for Ansible Control VM (JumpBox)",
+      "apiVersion":"[variables('apiVersion').network]",
+      "type":"Microsoft.Network/networkSecurityGroups",
+      "name":"[parameters('hcNetworkSecurityGroupName')]",
+      "location":"[variables('location')]",
+      "tags":{
+        "displayName":"HC-NetworkSecurityGroup"
+      },
+      "properties":{
+        "securityRules":[
+          {
+            "name":"openbar-in",
+            "properties":{
+              "protocol":"*",
+              "sourcePortRange":"*",
+              "destinationPortRange":"*",
+              "sourceAddressPrefix":"*",
+              "destinationAddressPrefix":"*",
+              "access":"Allow",
+              "priority":101,
+              "direction":"Inbound"
+            }
+          }
+        ]
+      }
+    },
+    { "comments":"OK: Network Security Group for front scaleset VMs",
+      "apiVersion":"[variables('apiVersion').network]",
+      "type":"Microsoft.Network/networkSecurityGroups",
+      "name":"[parameters('scNetworkSecurityGroupName')]",
+      "location":"[variables('location')]",
+      "tags":{
+        "displayName":"FRONT-NetworkSecurityGroup"
+      },
+      "properties":{
+        "securityRules":[
+          {
+            "name":"http80-in",
+            "properties":{
+              "protocol":"*",
+              "sourcePortRange":"*",
+              "destinationPortRange":"*",
+              "sourceAddressPrefix":"*",
+              "destinationAddressPrefix":"*",
+              "access":"Allow",
+              "priority":101,
+              "direction":"Inbound"
+            }
+          }
+        ]
+      }
+    },
+    { "comments":"OK: Network Security Group for Back VMs",
+      "apiVersion":"[variables('apiVersion').network]",
+      "type":"Microsoft.Network/networkSecurityGroups",
+      "name":"[parameters('bkNetworkSecurityGroupName')]",
+      "location":"[variables('location')]",
+      "tags":{
+        "displayName":"BACK-NetworkSecurityGroup"
+      },
+      "properties":{
+        "securityRules":[
+          {
+            "name":"acc-in",
+            "properties":{
+              "protocol":"*",
+              "sourcePortRange":"*",
+              "destinationPortRange":"*",
+              "sourceAddressPrefix":"*",
+              "destinationAddressPrefix":"*",
+              "access":"Allow",
+              "priority":101,
+              "direction":"Inbound"
+            }
+          }
+        ]
+      }
+    },
+    { "comments":"OK: Global Storage Account for Ansible control VM (JumpBox)",
+      "type":"Microsoft.Storage/storageAccounts",
+      "name":"[toLower(parameters('hcStorageAccountName'))]",
+      "apiVersion":"[variables('apiVersion').storage]",
+      "location":"[variables('location')]",
+      "properties":{
+        "accountType":"[parameters('hcStorageAccountType')]"
+      }
+    },
+    { "comments":"OK: Storage Account for Generated SSH keys or secrets",
+      "type":"Microsoft.Storage/storageAccounts",
+      "name":"[toLower(variables('keyStorageAccountName'))]",
+      "apiVersion":"[variables('apiVersion').storage]",
+      "location":"[variables('location')]",
+      "properties":{
+        "accountType":"[variables('keyStorageAccountType')]"
+      }
+    },
+    { "comments":"OK: Global Storage Account for the front scaleset VM",
+      "type":"Microsoft.Storage/storageAccounts",
+      "location":"[variables('location')]",
+      "name":"[concat(variables('uniqueStringArray')[copyIndex()], toLower(parameters('scStorageAccountName'))   )]",
+      "apiVersion":"[variables('apiVersion').storage]",
+      "copy":{
+        "name":"storageLoop",
+        "count":"[variables('scSaCount')]"
+      },
+      "properties":{
+        "accountType":"[parameters('scStorageAccountType')]"
+      }
+    },
+    { "comments":"OK: Public IP for Front Load Balancer",
+      "apiVersion":"[variables('apiVersion').network]",
+      "type":"Microsoft.Network/publicIPAddresses",
+      "name":"[parameters('scPublicIPAddressName')]",
+      "location":"[variables('location')]",
+      "properties":{
+        "publicIPAllocationMethod":"[parameters('scPublicIPAddressType')]",
+        "dnsSettings":{
+          "domainNameLabel":"[parameters('dnsNameForFrontPublicIP')]"
+        }
+      }
+    },
+    { "comments":"OK: Public IP for Ansible Control VM (JumpBox)",
+      "apiVersion":"[variables('apiVersion').network]",
+      "type":"Microsoft.Network/publicIPAddresses",
+      "name":"[parameters('hcPublicIPAddressName')]",
+      "location":"[variables('location')]",
+      "properties":{
+        "publicIPAllocationMethod":"[variables('hcPublicIPAddressType')]",
+        "dnsSettings":{
+          "domainNameLabel":"[parameters('dnsNameForAnsiblePublicIP')]"
+        }
+      }
+    },
+    { "comments":"OK: Virtual Network with 3 subnets admin, front, back",
+      "apiVersion":"[variables('apiVersion').network]",
+      "type":"Microsoft.Network/virtualNetworks",
+      "name":"[parameters('virtualNetworkName')]",
+      "location":"[variables('location')]",
+      "dependsOn":[
+        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('hcNetworkSecurityGroupName'))]",
+        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('scNetworkSecurityGroupName'))]",
+        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('bkNetworkSecurityGroupName'))]"
+      ],
+      "properties":{
+        "addressSpace":{
+          "addressPrefixes":[
+            "[parameters('addressPrefix')]"
+          ]
+        },
+        "subnets":[
+          {
+            "name":"[parameters('hcSubnetName')]",
+            "properties":{
+              "addressPrefix":"[parameters('hcSubnetPrefix')]",
+              "networkSecurityGroup":{
+                "id":"[resourceId('Microsoft.Network/networkSecurityGroups', parameters('hcNetworkSecurityGroupName'))]"
+              }
+            }
+          },
+          {
+            "name":"[parameters('scSubnetName')]",
+            "properties":{
+              "addressPrefix":"[parameters('scSubnetPrefix')]",
+              "networkSecurityGroup":{
+                "id":"[resourceId('Microsoft.Network/networkSecurityGroups', parameters('scNetworkSecurityGroupName'))]"
+              }
+            }
+          },
+          {
+            "name":"[parameters('bkSubnetName')]",
+            "properties":{
+              "addressPrefix":"[parameters('bkSubnetPrefix')]",
+              "networkSecurityGroup":{
+                "id":"[resourceId('Microsoft.Network/networkSecurityGroups', parameters('bkNetworkSecurityGroupName'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    { "comments":"OK: Load Balancer Definition for Front ScaleSet VM",
+      "apiVersion":"[variables('apiVersion').compute]",
+      "name":"[parameters('frLBName')]",
+      "type":"Microsoft.Network/loadBalancers",
+      "location":"[variables('location')]",
+      "dependsOn":[
+        "[concat('Microsoft.Network/publicIPAddresses/', parameters('scPublicIPAddressName'))]"
+      ],
+      "properties":{
+        "frontendIPConfigurations":[
+          {
+            "name":"LoadBalancerFrontend",
+            "properties":{
+              "publicIPAddress":{
+                "id":"[variables('lbPublicIPAddressID')]"
+              }
+            }
+          }
+        ],
+        "backendAddressPools":[
+          {
+            "name":"LoadBalancerBackend"
+          }
+        ],
+        "loadBalancingRules": [
+          {
+            "name": "LBRuleHttp",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[variables('frontEndIPConfigID')]"
+              },
+              "backendAddressPool": {
+                "id": "[variables('lbPoolID')]"
+              },
+              "protocol": "Tcp",
+              "frontendPort": 80,
+              "backendPort": 80,
+              "enableFloatingIP": false,
+              "idleTimeoutInMinutes": 5,
+              "loadDistribution": "SourceIP",
+              "probe": {
+                "id": "[variables('lbProbeID')]"
+              }
+            }
+          },
+          {
+            "name": "LBRuleHttps",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[variables('frontEndIPConfigID')]"
+              },
+              "backendAddressPool": {
+                "id": "[variables('lbPoolID')]"
+              },
+              "protocol": "Tcp",
+              "frontendPort": 443,
+              "backendPort": 443,
+              "enableFloatingIP": false,
+              "idleTimeoutInMinutes": 5,
+              "loadDistribution": "SourceIP",
+              "probe": {
+                "id": "[variables('lbProbeID')]"
+              }
+            }
+          }
+        ],
+        "probes": [
+          {
+            "name": "tcpProbe",
+            "properties": {
+              "protocol": "Tcp",
+              "port": 80,
+              "intervalInSeconds": 5,
+              "numberOfProbes": 2
+            }
+          }
+        ]
+      }
+    }
+
+   ],
+  "outputs": { }
+}
