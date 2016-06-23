@@ -339,6 +339,26 @@
             "visible":true
           },
           {
+            "name":"storageAccountJumpbox",
+            "type":"Microsoft.Storage.StorageAccountSelector",
+            "label":"Storage account for Jumpbox/NFS",
+            "toolTip":"Storage account where the Jumpbox/NFS VM disks will be stored.",
+            "defaultValue":{
+              "type":"Premium_LRS"
+            },
+            "options":{
+              "hideExisting":true
+            },
+            "constraints":{
+              "required":true,
+              "excludedTypes":[
+                "Standard_LRS",
+                "Standard_GRS",
+                "Standard_RAGRS"
+              ]
+            }
+          },
+          {
             "name":"scVmSize",
             "type":"Microsoft.Compute.SizeSelector",
             "label":"Web front-end VM Size",
@@ -392,26 +412,6 @@
             },
             "count":2,
             "visible":true
-          },
-          {
-            "name":"storageAccountJumpbox",
-            "type":"Microsoft.Storage.StorageAccountSelector",
-            "label":"Storage account for Jumpbox/NFS",
-            "toolTip":"Storage account where the Jumpbox/NFS VM disks will be stored.",
-            "defaultValue":{
-              "type":"Premium_LRS"
-            },
-            "options":{
-              "hideExisting":true
-            },
-            "constraints":{
-              "required":true,
-              "excludedTypes":[
-                "Standard_LRS",
-                "Standard_GRS",
-                "Standard_RAGRS"
-              ]
-            }
           },
           {
             "name":"storageAccountFront",
