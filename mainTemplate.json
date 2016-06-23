@@ -273,6 +273,8 @@
     "hcOSDiskName":"hcosdisk",
     "keyStorageAccountName":"[concat('key', uniquestring(resourceGroup().id, deployment().name))]",
     "keyStorageAccountType":"Standard_LRS",
+    "diagnosticsStorageAccountName": "[concat(uniqueString(resourceGroup().id),'diag')]",
+    "diagnosticsStorageAccountType": "Standard_LRS",
     "hcNicName":"hcVnic",
     "apiVersion":{
       "resources":{
@@ -308,6 +310,12 @@
           "contentVersion":"1.0.0.0"
         },
         "parameters":{
+          "diagnosticsStorageAccountName":{
+            "value":"[variables('diagnosticsStorageAccountName')]"
+          },
+          "diagnosticsStorageAccountType":{
+            "value":"[variables('diagnosticsStorageAccountType')]"
+          },
           "keyStorageAccountName":{
             "value":"[variables('keyStorageAccountName')]"
           },
@@ -481,6 +489,9 @@
           },
           "bkVmName":{
             "value":"[variables('bkVmName')]"
+          },
+           "diagnosticsStorageAccountName":{
+            "value":"[variables('diagnosticsStorageAccountName')]"
           }
         }
       }
@@ -550,7 +561,10 @@
           },
           "keyStorageAccountName":{
             "value":"[variables('keyStorageAccountName')]"
-          }
+          },
+           "diagnosticsStorageAccountName":{
+            "value":"[variables('diagnosticsStorageAccountName')]"
+          },
         }
       }
     },
@@ -613,6 +627,9 @@
           },
           "keyStorageAccountName":{
             "value":"[variables('keyStorageAccountName')]"
+          },
+           "diagnosticsStorageAccountName":{
+            "value":"[variables('diagnosticsStorageAccountName')]"
           }
         }
       }

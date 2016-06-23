@@ -164,6 +164,12 @@
       "metadata":{
         "description":"Back VM name suffix"
       }
+    },
+    "diagnosticsStorageAccountName":{
+      "type":"string",
+      "metadata":{
+        "description":"Storage Account Name for diags"
+      }      
     }
   },
   "variables":{
@@ -342,7 +348,7 @@
         "diagnosticsProfile":{
           "bootDiagnostics":{
             "enabled":"true",
-            "storageUri":"[concat(reference(concat('Microsoft.Storage/storageAccounts/', parameters('hcStorageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).primaryEndpoints.blob)]"
+            "storageUri":"[concat(reference(concat('Microsoft.Storage/storageAccounts/', parameters('diagnosticsStorageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).primaryEndpoints.blob)]"
           }
         }
       }

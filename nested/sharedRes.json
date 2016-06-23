@@ -2,6 +2,18 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "diagnosticsStorageAccountName":{
+      "type":"string",
+      "metadata":{
+        "description":"Storage Account Name for diags"
+      }      
+    },
+    "diagnosticsStorageAccountType":{
+      "type":"string",
+      "metadata":{
+        "description":"Storage Account type for diags"
+      }
+    },
     "keyStorageAccountName":{
       "type":"string",
       "metadata":{
@@ -294,6 +306,15 @@
       "location":"[variables('location')]",
       "properties":{
         "accountType":"[parameters('hcStorageAccountType')]"
+      }
+    },
+    { "comments":"OK: Global Storage Account for Diags",
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[parameters('diagnosticsStorageAccountName')]",
+      "apiVersion":"[variables('apiVersion').storage]",
+      "location":"[variables('location')]",
+      "properties": {
+        "accountType": "[parameters('diagnosticsStorageAccountType')]"
       }
     },
     { "comments":"OK: Storage Account for Generated SSH keys or secrets",
