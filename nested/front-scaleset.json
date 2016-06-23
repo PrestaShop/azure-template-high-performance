@@ -20,21 +20,18 @@
         "description":"The Ubuntu version for the VM."
       }
     },
-
     "scVmSize":{
       "type":"string",
       "metadata":{
         "description":"Instance size for Web Front VMs"
       }
     },
-
     "scPublicIPAddressName":{
       "type":"string",
       "metadata":{
         "description":"frPublicIP"
       }
     },
-
     "scStorageAccountName":{
       "type":"string",
       "metadata":{
@@ -45,12 +42,6 @@
       "type":"string",
       "metadata":{
         "description":"Account type"
-      }
-    },
-    "subnetCIDR":{
-      "type":"string",
-      "metadata":{
-        "description":"Subnet Suffix"
       }
     },
     "scSubnetRoot":{
@@ -68,10 +59,10 @@
         "description":"Subnet IP block"
       }
     },
-    "vnetID":{
+    "virtualNetworkName":{
       "type":"string",
       "metadata":{
-        "description":"vnet ID"
+        "description":"Virtual Network Name"
       }
     },
     "scVmName":{
@@ -80,7 +71,6 @@
         "description":"Basename of front VMs (max 9 characters)"
       }
     },
-
     "dnsNameForFrontPublicIP":{
       "type":"string",
       "metadata":{
@@ -107,6 +97,12 @@
         "description":"Base template URL",
         "artifactsBaseUrl": ""
       }
+    },
+    "keyStorageAccountName":{
+      "type":"string",
+      "metadata":{
+        "description":"StorageAccount Name for secrets"
+      }
     }
   },
   "variables":{
@@ -125,7 +121,8 @@
       "version":"latest"
     },
     "imageReference":"[variables('osType')]",
-    "scSubnetRef":"[concat(parameters('vnetID'),'/subnets/',parameters('scSubnetName'))]",
+    "vnetID":"[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
+    "scSubnetRef":"[concat(variables('vnetID'),'/subnets/',parameters('scSubnetName'))]",
     "diagnosticsStorageAccountName":"[concat(variables('uniqueStringArray')[0], parameters('scStorageAccountName'))]",
     "diagnosticsStorageAccountResourceGroup": "[resourceGroup().name]",
     "accountid": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',variables('diagnosticsStorageAccountResourceGroup'),'/providers/','Microsoft.Storage/storageAccounts/', variables('diagnosticsStorageAccountName'))]",

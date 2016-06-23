@@ -146,11 +146,29 @@
       "metadata":{
         "description":"StorageAccount Name for secrets"
       }
+    },
+    "hcVmName":{
+      "type":"string",
+      "metadata":{
+        "description":"JumpBox VM Name"
+      }
+    },
+    "scVmName":{
+      "type":"string",
+      "metadata":{
+        "description":"web-front ScaleSet vm suffix"
+      }
+    },
+    "bkVmName":{
+      "type":"string",
+      "metadata":{
+        "description":"Back VM name suffix"
+      }
     }
   },
   "variables":{
     "location":"[resourceGroup().location]",
-    "hcVmName":"[concat('ans', resourceGroup().name)]",
+   
     "hcNicName":"hcVnic",
     "vnetID":"[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
     "hcSubnetRef":"[concat(variables('vnetID'),'/subnets/',parameters('hcSubnetName'))]",
@@ -160,8 +178,8 @@
     "ubuntuOSVersion":"16.04.0-LTS",
     "hcOSDiskName":"hcosdisk",
     "scriptsBaseUrl":"https://raw.githubusercontent.com/PrestaShop/azure-template-high-performance/master/scripts/",
-    "scVmName":"[concat('web', resourceGroup().name)]",
-    "bkVmName":"[concat('bdd', resourceGroup().name)]",
+    
+    
     "ansiblePlaybookLocation":"deploy-prestashop.yml",
     "ansibleRolesReqLocation":"install_roles.yml",
     "ansibleVarsLocation":"vars/main.yml",
@@ -184,17 +202,17 @@
     "bkSubnetRoot":"[concat( split(parameters('bkSubnetPrefix'), '.')[0], '.', split(parameters('bkSubnetPrefix'), '.')[1], '.', split(parameters('bkSubnetPrefix'), '.')[2])]",
     "paramsSubnets":"[concat(variables('hcSubnetRoot'),'\" \"',variables('frSubnetRoot'),'\" \"',variables('bkSubnetRoot'))]",
     "paramsNbHosts":"[concat('0 \"',parameters('numberOfBack'))]",
-    "paramsNames":"[concat(variables('hcVmName'),'\" \"',variables('scVmName'),'\" \"',variables('bkVmName'))]",
+    "paramsNames":"[concat(parameters('hcVmName'),'\" \"',parameters('scVmName'),'\" \"',parameters('bkVmName'))]",
     "paramsExtra":"[concat(parameters('prestashop_password'),'\" \"',parameters('dnsNameForFrontPublicIP'),'.',variables('location'))]",
     "paramsAdmin":"[concat(parameters('prestashop_firstname'),'\" \"',parameters('prestashop_lastname'),'\" \"',parameters('prestashop_email'),'\" \"',toLower(parameters('bkVmSize')))]",
     "paramsDeploy":"[concat(parameters('adminUsername'),'\" \"',variables('paramsSubnets'),'\" \"',variables('paramsNbHosts'),'\" \"',variables('paramsNames'),'\" \"',variables('paramsExtra'),'\" \"',variables('paramsAdmin'))]",
     "osProfile_hc_password":{
-      "computerName":"[variables('hcVmName')]",
+      "computerName":"[parameters('hcVmName')]",
       "adminUsername":"[parameters('adminUsername')]",
       "adminPassword":"[parameters('adminPassword')]"
     },
     "osProfile_hc_sshPublicKey":{
-      "computerName":"[variables('hcVmName')]",
+      "computerName":"[parameters('hcVmName')]",
       "adminUsername":"[parameters('adminUsername')]",
       "linuxConfiguration":{
         "disablePasswordAuthentication":"true",
@@ -254,11 +272,11 @@
     {
       "comments":"OK: Custom script extension for the Ansible Control VM",
       "type":"Microsoft.Compute/virtualMachines/extensions",
-      "name":"[concat(variables('hcVmName'),'/installAnsible')]",
+      "name":"[concat(parameters('hcVmName'),'/installAnsible')]",
       "apiVersion":"[variables('apiVersion').compute]",
       "location":"[resourceGroup().location]",
       "dependsOn":[
-        "[concat('Microsoft.Compute/virtualMachines/', variables('hcVmName'))]"
+        "[concat('Microsoft.Compute/virtualMachines/', parameters('hcVmName'))]"
       ],
       "properties":{
         "publisher":"Microsoft.OSTCExtensions",
@@ -286,7 +304,7 @@
       "comments":"Ansible Contol VM plays the playbook to provision the LAMP cluster",
       "apiVersion":"[variables('apiVersion').compute]",
       "type":"Microsoft.Compute/virtualMachines",
-      "name":"[variables('hcVmName')]",
+      "name":"[parameters('hcVmName')]",
       "location":"[variables('location')]",
       "dependsOn":[
         "[concat('Microsoft.Storage/storageAccounts/', toLower(parameters('hcStorageAccountName')) ) ]",

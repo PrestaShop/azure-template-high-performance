@@ -267,6 +267,7 @@
       "backTemplateURL":"[concat(parameters('templatesBaseURL'),'/nested/back.json')]"
     },
     "dnsserver":"8.8.8.8",
+    "subnetCIDR":".0/24",
     "location":"[resourceGroup().location]",
     "imagePublisher":"Canonical",
     "imageOffer":"UbuntuServer",
@@ -287,12 +288,14 @@
     
     "scPublicIPAddressType":"Dynamic",
     "frLBName":"[concat('lb', resourceGroup().name)]",
+    "hcVmName":"[concat('ans', resourceGroup().name)]",
+    "scVmName":"[concat('web', resourceGroup().name)]",
+    "bkVmName":"[concat('bdd', resourceGroup().name)]",
 
     "hcSubnetRoot":"[concat( split(parameters('hcSubnetPrefix'), '.')[0], '.', split(parameters('hcSubnetPrefix'), '.')[1], '.', split(parameters('hcSubnetPrefix'), '.')[2])]",
     "scSubnetRoot":"[concat( split(parameters('scSubnetPrefix'), '.')[0], '.', split(parameters('scSubnetPrefix'), '.')[1], '.', split(parameters('scSubnetPrefix'), '.')[2])]",
     "bkSubnetRoot":"[concat( split(parameters('bkSubnetPrefix'), '.')[0], '.', split(parameters('bkSubnetPrefix'), '.')[1], '.', split(parameters('bkSubnetPrefix'), '.')[2])]"
     
-
   },
   "resources": [ 
     { "comments": "OK: Shared resource deployment",
@@ -382,9 +385,7 @@
         }
       }
     },
-
-    {
-      "comments": "TODO: Jumpbox resource deployment",
+    { "comments": "OK: Jumpbox resource deployment",
       "name":"JumpBoxDeployment",
       "type":"Microsoft.Resources/deployments",
       "apiVersion":"[variables('apiVersion').deployment]",
@@ -468,12 +469,20 @@
           },
           "keyStorageAccountName":{
             "value":"[variables('keyStorageAccountName')]"
+          },
+          "hcVmName":{
+            "value":"[variables('hcVmName')]"
+          },
+          "scVmName":{
+            "value":"[variables('scVmName')]"
+          },
+          "bkVmName":{
+            "value":"[variables('bkVmName')]"
           }
         }
       }
     },
-
-    {"comments": "TODO: Scale set front deployment resource",
+    { "comments": "OK: Scale set front deployment resource",
       "name":"FrontDeployment",
       "type":"Microsoft.Resources/deployments",
       "apiVersion":"[variables('apiVersion').deployment]",
@@ -498,47 +507,44 @@
           "ubuntuOSVersion":{
             "value":"[variables('ubuntuOSVersion')]"
           },
-          "frVmSize":{
-            "value":"[parameters('frVmSize')]"
+          "scVmSize":{
+            "value":"[parameters('scVmSize')]"
           },
-          "numberOfFront":{
-            "value":"[parameters('numberOfFront')]"
+          "scPublicIPAddressName":{
+            "value":"[parameters('scPublicIPAddressName')]"
           },
-          "frAvailabilitySetName":{
-            "value":"[variables('frAvailabilitySetName')]"
+          "scStorageAccountName":{
+            "value":"[parameters('scStorageAccountName')]"
           },
-          "frStorageAccountName":{
-            "value":"[parameters('frStorageAccountName')]"
+          "scStorageAccountType":{
+            "value":"[parameters('scStorageAccountType')]"
           },
-          "frStorageAccountType":{
-            "value":"[parameters('frStorageAccountType')]"
+          "scSubnetRoot":{
+            "value":"[variables('scSubnetRoot')]"
           },
-          "subnetCIDR":{
-            "value":"[variables('subnetCIDR')]"
+          "scSubnetName":{
+            "value":"[parameters('scSubnetName')]"
           },
-          "frSubnetRoot":{
-            "value":"[variables('frSubnetRoot')]"
+          "scSubnetPrefix":{
+            "value":"[parameters('scSubnetPrefix')]"
           },
-          "frSubnetName":{
-            "value":"[parameters('frSubnetName')]"
+          "virtualNetworkName":{
+            "value":"[parameters('virtualNetworkName')]"
           },
-          "frSubnetPrefix":{
-            "value":"[parameters('frSubnetPrefix')]"
-          },
-          "vnetID":{
-            "value":"[variables('vnetID')]"
-          },
-          "frVmName":{
-            "value":"[variables('frVmName')]"
+          "scVmName":{
+            "value":"[variables('scVmName')]"
           },
           "dnsNameForFrontPublicIP": {
              "value":"[parameters('dnsNameForFrontPublicIP')]"
           },
-          "frPublicIPAddressName": {
-            "value":"[parameters('frPublicIPAddressName')]"
+          "instanceCount": {
+            "value":"[parameters('instanceCount')]"
           },
-          "shopSize":{
-            "value":"[parameters('shopSize')]"
+          "frLBName":{
+            "value":"[variables('frLBName')]"
+          },
+          "templatesBaseURL":{
+            "value":"[parameters('templatesBaseURL')]"
           },
           "keyStorageAccountName":{
             "value":"[variables('keyStorageAccountName')]"
