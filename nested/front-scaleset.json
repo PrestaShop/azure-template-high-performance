@@ -163,14 +163,7 @@
       "name":"[parameters('scVmName')]",
       "location":"[variables('location')]",
       "apiVersion":"[variables('apiVersion')]",
-      "dependsOn":[
-        "[concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[0], parameters('scStorageAccountName'))]",
-        "[concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[1], parameters('scStorageAccountName'))]",
-        "[concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[2], parameters('scStorageAccountName'))]",
-        "[concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[3], parameters('scStorageAccountName'))]",
-        "[concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[4], parameters('scStorageAccountName'))]",
-        "[concat('Microsoft.Network/loadBalancers/', parameters('frLBName'))]"
-      ],
+      "dependsOn":[ ],
       "sku":{
         "name":"[parameters('scVmSize')]",
         "tier":"Standard",

@@ -219,7 +219,6 @@
         "count":"[parameters('numberOfBack')]"
       },
       "dependsOn":[
-        "[concat('Microsoft.Storage/storageAccounts/', toLower(parameters('bkStorageAccountName')) ) ]",
         "[concat('Microsoft.Network/networkInterfaces/', variables('bkNicName'),copyindex())]"
       ],
       "properties":{

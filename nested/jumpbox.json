@@ -250,13 +250,10 @@
       "name":"[variables('hcNicName')]",
       "location":"[variables('location')]",
       "dependsOn":[
-        "[concat('Microsoft.Network/publicIPAddresses/', parameters('hcPublicIPAddressName'))]",
-        "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
       ],
       "properties":{
         "dnsSettings":{
           "dnsServers":[
-
           ]
         },
         "ipConfigurations":[
@@ -313,8 +310,6 @@
       "name":"[parameters('hcVmName')]",
       "location":"[variables('location')]",
       "dependsOn":[
-        "[concat('Microsoft.Storage/storageAccounts/', toLower(parameters('hcStorageAccountName')) ) ]",
-        "[concat('Microsoft.Storage/storageAccounts/', toLower(parameters('keyStorageAccountName')) )]",
         "[concat('Microsoft.Network/networkInterfaces/', variables('hcNicName'))]"
       ],
       "properties":{
