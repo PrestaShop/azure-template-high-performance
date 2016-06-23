@@ -177,7 +177,6 @@
         },
         "bladeTitle":"Virtual Machines Parameters",
         "elements":[
-
          {
             "name":"hcNetworkSecurityGroupName",
             "type":"Microsoft.Common.TextBox",
@@ -217,15 +216,13 @@
               "validationMessage":"Network Security Group Name must contain at least 2 characters and can contain only numbers and letters."
             }
           },
-
-
           {
             "name":"instanceCount",
             "type":"Microsoft.Common.DropDown",
             "label":"Minimum number of Web front-end VMs",
             "defaultValue":"2",
             "toolTip":"Specify the minimal number of Web front-end for this cluster.",
-            "visible":false,
+            "visible":true,
             "constraints":{
               "allowedValues":[
                 {
