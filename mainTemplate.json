@@ -309,6 +309,9 @@
           "contentVersion":"1.0.0.0"
         },
         "parameters":{
+          "keyStorageAccountName":{
+            "value":"[variables('keyStorageAccountName')]"
+          },
           "hcStorageAccountName":{
             "value":"[parameters('hcStorageAccountName')]"
           },
