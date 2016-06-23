@@ -250,6 +250,12 @@
         "description":"Name of Back subnet"
       },
       "defaultValue":"back-subnet"
+    },
+    "location":{
+      "type":"string",
+      "metadata": {
+        "description":"Deployment location"
+      }
     }
   },
   "variables":{
@@ -261,7 +267,6 @@
     },
     "dnsserver":"8.8.8.8",
     "subnetCIDR":".0/24",
-    "location":"[resourceGroup().location]",
     "imagePublisher":"Canonical",
     "imageOffer":"UbuntuServer",
     "ubuntuOSVersion":"16.04.0-LTS",
@@ -616,11 +621,11 @@
   ],
   "outputs":{
     "Ansible FQDN":{
-      "value":"[concat(parameters('dnsNameForAnsiblePublicIP'),'.',variables('location'),'.cloudapp.azure.com')]",
+      "value":"[concat(parameters('dnsNameForAnsiblePublicIP'),'.',parameters('location'),'.cloudapp.azure.com')]",
       "type":"string"
     },
     "SHOP FQDN":{
-      "value":"[concat(parameters('dnsNameForFrontPublicIP'),'.',variables('location'),'cloudapp.azure.com')]",
+      "value":"[concat(parameters('dnsNameForFrontPublicIP'),'.',parameters('location'),'cloudapp.azure.com')]",
       "type":"string"
     }
   }
