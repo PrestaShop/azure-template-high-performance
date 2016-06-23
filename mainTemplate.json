@@ -300,7 +300,6 @@
       "type":"Microsoft.Resources/deployments",
       "apiVersion":"[variables('apiVersion').deployment]",
       "dependsOn":[
-
       ],
       "properties":{
         "mode":"Incremental",
@@ -393,9 +392,7 @@
       "type":"Microsoft.Resources/deployments",
       "apiVersion":"[variables('apiVersion').deployment]",
       "dependsOn":[
-        "[concat('Microsoft.Storage/storageAccounts/', variables('keyStorageAccountName'))]",
-        "[concat('Microsoft.Network/networkSecurityGroups/',parameters('hcNetworkSecurityGroupName'))]",
-        "[concat('Microsoft.Network/virtualNetworks/',parameters('virtualNetworkName'))]"
+          "[concat('Microsoft.Resources/deployments/', 'SharedDeployment')]"
       ],
       "properties":{
         "mode":"Incremental",
@@ -491,9 +488,7 @@
       "type":"Microsoft.Resources/deployments",
       "apiVersion":"[variables('apiVersion').deployment]",
       "dependsOn":[
-        "[concat('Microsoft.Storage/storageAccounts/', variables('keyStorageAccountName'))]",
-        "[concat('Microsoft.Network/networkSecurityGroups/',parameters('scNetworkSecurityGroupName'))]",
-        "[concat('Microsoft.Network/virtualNetworks/',parameters('virtualNetworkName'))]"
+        "[concat('Microsoft.Resources/deployments/', 'SharedDeployment')]"
       ],
       "properties":{
         "mode":"Incremental",
@@ -562,9 +557,7 @@
       "type":"Microsoft.Resources/deployments",
       "apiVersion":"[variables('apiVersion').deployment]",
       "dependsOn":[
-        "[concat('Microsoft.Storage/storageAccounts/', variables('keyStorageAccountName'))]",
-        "[concat('Microsoft.Network/networkSecurityGroups/',parameters('bkNetworkSecurityGroupName'))]",
-        "[concat('Microsoft.Network/virtualNetworks/',parameters('virtualNetworkName'))]"
+        "[concat('Microsoft.Resources/deployments/', 'SharedDeployment')]"
       ],
       "properties":{
         "mode":"Incremental",
