@@ -1,14 +1,14 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": { 
+  "$schema":"https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion":"1.0.0.0",
+  "parameters":{
     "templatesBaseURL":{
       "type":"string",
-      "metadata": {
+      "metadata":{
         "description":"Base template URL for nested template",
-        "artifactsBaseUrl": ""
+        "artifactsBaseUrl":""
       },
-      "defaultValue": "https://raw.githubusercontent.com/PrestaShop/azure-template-high-performance/master"
+      "defaultValue":"https://raw.githubusercontent.com/PrestaShop/azure-template-high-performance/master"
     },
     "dnsNameForAnsiblePublicIP":{
       "type":"string",
@@ -16,28 +16,21 @@
         "description":"Dns Name for Jumpbox VM"
       }
     },
-    "dnsNameForScPublicIP":{
-      "type":"string",
-      "metadata":{
-        "description":"Public IP address for Jumpbox VM"
-      }
-    },
     "hcPublicIPAddressName":{
       "type":"string",
-      "defaultValue": "hcPublicIP", 
+      "defaultValue":"hcPublicIP",
       "metadata":{
         "description":"Public IP address Name for Jumpbox VM"
       }
     },
     "scPublicIPAddressName":{
       "type":"string",
-      "defaultValue": "scPublicIP", 
+      "defaultValue":"scPublicIP",
       "metadata":{
         "description":"Public IP address Name for web-front scaleset load balancer VM"
       }
     },
-
-   "dnsNameForFrontPublicIP":{
+    "dnsNameForFrontPublicIP":{
       "type":"string",
       "metadata":{
         "description":"Public IP address for web-front LB "
@@ -50,18 +43,18 @@
       },
       "defaultValue":"pr35745h0p"
     },
-    "authenticationType": {
-      "type": "string",
-      "allowedValues": [
+    "authenticationType":{
+      "type":"string",
+      "allowedValues":[
         "password",
         "sshPublicKey"
       ]
     },
-    "adminPassword": {
-      "type": "securestring",
-      "defaultValue": "", 
-      "metadata": {
-        "description": "Password for the Virtual Machine. Not used if authenticationType of sshPublicKey."
+    "adminPassword":{
+      "type":"securestring",
+      "defaultValue":"",
+      "metadata":{
+        "description":"Password for the Virtual Machine. Not used if authenticationType of sshPublicKey."
       }
     },
     "sshKeyData":{
@@ -108,62 +101,74 @@
     },
     "hcStorageAccountName":{
       "type":"string",
-      "metadata": {
+      "metadata":{
         "description":"Storage Account Name for JumpBox"
       }
     },
-    "hcStorageAccountType": {
-      "type": "string",
-      "defaultValue": "Premium_LRS",
+    "hcStorageAccountType":{
+      "type":"string",
+      "defaultValue":"Premium_LRS",
       "metadata":{
         "description":"Storage Account type for hc VMs"
       }
-    }, 
-   "scStorageAccountType": {
-      "type": "string",
-      "defaultValue": "Premium_LRS",
+    },
+    "scStorageAccountName":{
+      "type":"string",
+      "metadata":{
+        "description":"Storage Account Name for Front Scale Set VMs"
+      }
+    },
+    "scStorageAccountType":{
+      "type":"string",
+      "defaultValue":"Premium_LRS",
       "metadata":{
         "description":"Storage Account type for Front VMs"
       }
     },
-    "bkStorageAccountType": {
-      "type": "string",
-      "defaultValue": "Premium_LRS",
+    "bkStorageAccountName":{
+      "type":"string",
+      "metadata":{
+        "description":"Storage Account Name for Back VMs"
+      }
+    },
+    "bkStorageAccountType":{
+      "type":"string",
+      "defaultValue":"Premium_LRS",
       "metadata":{
         "description":"Storage Account type for Back VMs"
       }
     },
     "hcNetworkSecurityGroupName":{
       "type":"string",
-      "metadata": {
+      "metadata":{
         "description":"Network Security group for Jumpbox"
       },
-      "defaultValue": "hcSecurityGroup"
+      "defaultValue":"hcSecurityGroup"
     },
     "scNetworkSecurityGroupName":{
       "type":"string",
-      "metadata": {
+      "metadata":{
         "description":"Network Security group for web-front scaleset"
       },
-      "defaultValue": "scSecurityGroup"
+      "defaultValue":"scSecurityGroup"
     },
     "bkNetworkSecurityGroupName":{
       "type":"string",
-      "metadata": {
+      "metadata":{
         "description":"Network Security group for Back"
       },
-      "defaultValue": "bkSecurityGroup"
+      "defaultValue":"bkSecurityGroup"
     },
-    "shopSize": {
-      "type": "string",
-      "defaultValue": "Small",
-      "allowedValues": [
+    "shopSize":{
+      "type":"string",
+      "defaultValue":"Small",
+      "allowedValues":[
         "Small",
         "Medium",
         "Large"
       ],
-      "metadata": {
-        "description": "T-shirt size of the PrestaShop cluster"
+      "metadata":{
+        "description":"T-shirt size of the PrestaShop cluster"
       }
     },
     "prestashop_firstname":{
@@ -192,74 +197,62 @@
     },
     "hcSubnetPrefix":{
       "type":"string",
-      "metadata": {
+      "metadata":{
         "description":"Control VM Subnet Prefix"
       },
-      "defaultValue": "10.0.0.0/24"
+      "defaultValue":"10.0.0.0/24"
     },
     "scSubnetPrefix":{
       "type":"string",
-      "metadata": {
+      "metadata":{
         "description":"Front Subnet Prefix"
       },
-      "defaultValue": "10.0.2.0/24"
+      "defaultValue":"10.0.2.0/24"
     },
     "bkSubnetPrefix":{
       "type":"string",
-      "metadata": {
+      "metadata":{
         "description":"Back Subnet Prefix"
       },
-      "defaultValue": "10.0.4.0/24"
+      "defaultValue":"10.0.4.0/24"
     },
     "virtualNetworkName":{
       "type":"string",
-      "metadata": {
+      "metadata":{
         "description":"Virtual Network Name"
       },
-      "defaultValue": "vnet-prestashop"
+      "defaultValue":"vnet-prestashop"
     },
     "addressPrefix":{
       "type":"string",
-      "metadata": {
+      "metadata":{
         "description":"Virtual Network address Prefix"
       },
-      "defaultValue": "10.0.0.0/16"
+      "defaultValue":"10.0.0.0/16"
     },
     "hcSubnetName":{
       "type":"string",
-      "metadata": {
+      "metadata":{
         "description":"Name of Jumpbox subnet"
       },
-      "defaultValue": "hc-subnet"
+      "defaultValue":"hc-subnet"
     },
     "scSubnetName":{
       "type":"string",
-      "metadata": {
+      "metadata":{
         "description":"Name of Front ScaleSet subnet"
       },
-      "defaultValue": "front-subnet"
+      "defaultValue":"front-subnet"
     },
     "bkSubnetName":{
       "type":"string",
-      "metadata": {
+      "metadata":{
         "description":"Name of Back subnet"
       },
-      "defaultValue": "back-subnet"
-    },
-    "scStorageAccountName":{
-      "type":"string",
-      "metadata": {
-        "description":"Storage Account Name for Front Scale Set VMs"
-      }
-    },
-    "bkStorageAccountName":{
-      "type":"string",
-      "metadata": {
-        "description":"Storage Account Name for Back VMs"
-      }
+      "defaultValue":"back-subnet"
     }
   },
-  "variables": { 
+  "variables":{
     "configuration":{
       "sharTemplateURL":"[concat(parameters('templatesBaseURL'),'/nested/sharedRes.json')]",
       "jumpTemplateURL":"[concat(parameters('templatesBaseURL'),'/nested/jumpbox.json')]",
@@ -285,32 +278,32 @@
       "compute":"2015-06-15",
       "deployment":"2016-02-01"
     },
-    
     "scPublicIPAddressType":"Dynamic",
     "frLBName":"[concat('lb', resourceGroup().name)]",
     "hcVmName":"[concat('ans', resourceGroup().name)]",
     "scVmName":"[concat('web', resourceGroup().name)]",
     "bkVmName":"[concat('bdd', resourceGroup().name)]",
     "bkAvailabilitySetName":"[concat('bkav', resourceGroup().name)]",
-
     "hcSubnetRoot":"[concat( split(parameters('hcSubnetPrefix'), '.')[0], '.', split(parameters('hcSubnetPrefix'), '.')[1], '.', split(parameters('hcSubnetPrefix'), '.')[2])]",
     "scSubnetRoot":"[concat( split(parameters('scSubnetPrefix'), '.')[0], '.', split(parameters('scSubnetPrefix'), '.')[1], '.', split(parameters('scSubnetPrefix'), '.')[2])]",
     "bkSubnetRoot":"[concat( split(parameters('bkSubnetPrefix'), '.')[0], '.', split(parameters('bkSubnetPrefix'), '.')[1], '.', split(parameters('bkSubnetPrefix'), '.')[2])]"
-    
   },
-  "resources": [ 
-    { "comments": "OK: Shared resource deployment",
+  "resources":[
+    {
+      "comments":"OK: Shared resource deployment",
       "name":"FrontDeployment",
       "type":"Microsoft.Resources/deployments",
       "apiVersion":"[variables('apiVersion').deployment]",
-      "dependsOn":[],
+      "dependsOn":[
+
+      ],
       "properties":{
         "mode":"Incremental",
         "templateLink":{
           "uri":"[variables('configuration').sharTemplateURL]",
           "contentVersion":"1.0.0.0"
         },
-       "parameters":{
+        "parameters":{
           "hcStorageAccountName":{
             "value":"[parameters('hcStorageAccountName')]"
           },
@@ -380,13 +373,14 @@
           "bkSubnetPrefix":{
             "value":"[parameters('bkSubnetPrefix')]"
           },
-          "dnsNameForFrontPublicIP": {
-             "value":"[parameters('dnsNameForFrontPublicIP')]"
+          "dnsNameForFrontPublicIP":{
+            "value":"[parameters('dnsNameForFrontPublicIP')]"
           }
         }
       }
     },
-    { "comments": "OK: Jumpbox resource deployment",
+    {
+      "comments":"OK: Jumpbox resource deployment",
       "name":"JumpBoxDeployment",
       "type":"Microsoft.Resources/deployments",
       "apiVersion":"[variables('apiVersion').deployment]",
@@ -465,7 +459,7 @@
           "bkVmSize":{
             "value":"[parameters('bkVmSize')]"
           },
-           "hcVmSize":{
+          "hcVmSize":{
             "value":"[parameters('hcVmSize')]"
           },
           "keyStorageAccountName":{
@@ -483,7 +477,8 @@
         }
       }
     },
-    { "comments": "OK: Scale set front deployment resource",
+    {
+      "comments":"OK: Scale set front deployment resource",
       "name":"FrontDeployment",
       "type":"Microsoft.Resources/deployments",
       "apiVersion":"[variables('apiVersion').deployment]",
@@ -535,10 +530,10 @@
           "scVmName":{
             "value":"[variables('scVmName')]"
           },
-          "dnsNameForFrontPublicIP": {
-             "value":"[parameters('dnsNameForFrontPublicIP')]"
+          "dnsNameForFrontPublicIP":{
+            "value":"[parameters('dnsNameForFrontPublicIP')]"
           },
-          "instanceCount": {
+          "instanceCount":{
             "value":"[parameters('instanceCount')]"
           },
           "frLBName":{
@@ -553,7 +548,8 @@
         }
       }
     },
-    { "comments": "TODO: Scale set front deployment resource",
+    {
+      "comments":"TODO: Scale set front deployment resource",
       "name":"BackDeployment",
       "type":"Microsoft.Resources/deployments",
       "apiVersion":"[variables('apiVersion').deployment]",
@@ -618,14 +614,14 @@
       }
     }
   ],
-  "outputs": {
-    "Ansible FQDN": {
-      "value": "[concat(parameters('dnsNameForAnsiblePublicIP'),'.',variables('location'),'.cloudapp.azure.com')]",
-      "type": "string" 
+  "outputs":{
+    "Ansible FQDN":{
+      "value":"[concat(parameters('dnsNameForAnsiblePublicIP'),'.',variables('location'),'.cloudapp.azure.com')]",
+      "type":"string"
     },
-    "SHOP FQDN": {
-      "value": "[concat(parameters('dnsNameForFrontPublicIP'),'.',variables('location'),'cloudapp.azure.com')]",
-      "type": "string" 
+    "SHOP FQDN":{
+      "value":"[concat(parameters('dnsNameForFrontPublicIP'),'.',variables('location'),'cloudapp.azure.com')]",
+      "type":"string"
     }
-   }
+  }
 }
