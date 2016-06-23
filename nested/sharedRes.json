@@ -298,7 +298,7 @@
     },
     { "comments":"OK: Storage Account for Generated SSH keys or secrets",
       "type":"Microsoft.Storage/storageAccounts",
-      "name":"[toLower(variables('keyStorageAccountName'))]",
+      "name":"[toLower(parameters('keyStorageAccountName'))]",
       "apiVersion":"[variables('apiVersion').storage]",
       "location":"[variables('location')]",
       "properties":{
