@@ -380,6 +380,9 @@
           "bkSubnetPrefix":{
             "value":"[parameters('bkSubnetPrefix')]"
           },
+          "bkAvailabilitySetName":{
+            "value":"[variables('bkAvailabilitySetName')]"
+          },
           "dnsNameForFrontPublicIP":{
             "value":"[parameters('dnsNameForFrontPublicIP')]"
           }
@@ -552,7 +555,7 @@
       }
     },
     {
-      "comments":"TODO: Scale set front deployment resource",
+      "comments":"OK: Scale set front deployment resource",
       "name":"BackDeployment",
       "type":"Microsoft.Resources/deployments",
       "apiVersion":"[variables('apiVersion').deployment]",
