@@ -1,7 +1,7 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
+  "$schema":"https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion":"1.0.0.0",
+  "parameters":{
     "adminUsername":{
       "type":"string",
       "metadata":{
@@ -9,58 +9,84 @@
       },
       "defaultValue":"pr35745h0p"
     },
+    "adminPassword":{
+      "type":"string",
+      "metadata":{
+        "description":"Admin Password for the Vms"
+      },
+      "defaultValue":"pr35745h0p"
+    },
+    "sshKeyData":{
+      "type":"string",
+      "metadata":{
+        "description":"SSH RSA public key file as a string. Not used if authenticationType of password."
+      }
+    },
+    "authenticationType":{
+      "type":"string",
+      "allowedValues":[
+        "password",
+        "sshPublicKey"
+      ]
+    },
     "hcStorageAccountName":{
       "type":"string",
-      "metadata": {
+      "metadata":{
         "description":"Storage Account Name for JumpBox"
+      }
+    },
+    "dnsNameForAnsiblePublicIP":{
+      "type":"string",
+      "metadata":{
+        "description":"DNS Name address for Jumpbox VM"
       }
     },
     "hcPublicIPAddressName":{
       "type":"string",
-      "defaultValue": "hcPublicIP", 
+      "defaultValue":"hcPublicIP",
       "metadata":{
         "description":"Public IP address Name for Jumpbox VM"
       }
     },
     "virtualNetworkName":{
       "type":"string",
-      "metadata": {
+      "metadata":{
         "description":"Virtual Network Name"
       }
     },
     "hcSubnetName":{
       "type":"string",
-      "metadata": {
+      "metadata":{
         "description":"Name of Jumpbox subnet"
       }
     },
     "hcSubnetPrefix":{
       "type":"string",
-      "metadata": {
+      "metadata":{
         "description":"Control VM Subnet Prefix"
       }
     },
     "scSubnetName":{
       "type":"string",
-      "metadata": {
+      "metadata":{
         "description":"Name of web-front scaleset subnet"
       }
     },
     "scSubnetPrefix":{
       "type":"string",
-      "metadata": {
+      "metadata":{
         "description":"web-front scaleset Subnet Prefix"
       }
     },
     "bkSubnetName":{
       "type":"string",
-      "metadata": {
+      "metadata":{
         "description":"Name of back subnet"
       }
     },
     "bkSubnetPrefix":{
       "type":"string",
-      "metadata": {
+      "metadata":{
         "description":"back Subnet Prefix"
       }
     },
@@ -114,27 +140,34 @@
       "metadata":{
         "description":"Instance size for Ansible VM Control"
       }
+    },
+    "keyStorageAccountName":{
+      "type":"string",
+      "metadata":{
+        "description":"StorageAccount Name for secrets"
+      }
     }
   },
-  "variables": {
+  "variables":{
     "location":"[resourceGroup().location]",
     "hcVmName":"[concat('ans', resourceGroup().name)]",
     "hcNicName":"hcVnic",
     "vnetID":"[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
     "hcSubnetRef":"[concat(variables('vnetID'),'/subnets/',parameters('hcSubnetName'))]",
-
+    "sshKeyPath":"[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
+    "imagePublisher":"Canonical",
+    "imageOffer":"UbuntuServer",
+    "ubuntuOSVersion":"16.04.0-LTS",
+    "hcOSDiskName":"hcosdisk",
     "scriptsBaseUrl":"https://raw.githubusercontent.com/PrestaShop/azure-template-high-performance/master/scripts/",
-
     "scVmName":"[concat('web', resourceGroup().name)]",
     "bkVmName":"[concat('bdd', resourceGroup().name)]",
-
     "ansiblePlaybookLocation":"deploy-prestashop.yml",
     "ansibleRolesReqLocation":"install_roles.yml",
     "ansibleVarsLocation":"vars/main.yml",
     "ansibleVarsMasterLocation":"vars/master.yml",
     "ansibleVarsSlaveLocation":"vars/slave.yml",
     "ansibleVarsDefaultLocation":"vars/mysql_default.yml",
-
     "customScriptDeployFile":"deploy.sh",
     "customScriptDeployUrl":"[concat(variables('scriptsBaseUrl'),variables('customScriptDeployFile'))]",
     "customScriptAnsibleCommand":"[concat('bash ',variables('customScriptDeployFile'))]",
@@ -145,20 +178,36 @@
     "ansibleVarsSlavesUrl":"[concat(variables('scriptsBaseUrl'),variables('ansibleVarsSlaveLocation'))]",
     "ansibleVarsDefaultsUrl":"[concat(variables('scriptsBaseUrl'),variables('ansibleVarsDefaultLocation'))]",
     "pythonAzureScriptUrl":"[concat(variables('scriptsBaseUrl'),'WriteSSHToPrivateStorage.py')]",
-
-    "keyStorageAccountName":"[concat('key', uniquestring(resourceGroup().id, deployment().name))]",
-
+    "hcVmStorageAccountContainerName":"vhds",
     "hcSubnetRoot":"[concat( split(parameters('hcSubnetPrefix'), '.')[0], '.', split(parameters('hcSubnetPrefix'), '.')[1], '.', split(parameters('hcSubnetPrefix'), '.')[2])]",
     "frSubnetRoot":"[concat( split(parameters('scSubnetPrefix'), '.')[0], '.', split(parameters('scSubnetPrefix'), '.')[1], '.', split(parameters('scSubnetPrefix'), '.')[2])]",
     "bkSubnetRoot":"[concat( split(parameters('bkSubnetPrefix'), '.')[0], '.', split(parameters('bkSubnetPrefix'), '.')[1], '.', split(parameters('bkSubnetPrefix'), '.')[2])]",
-  
     "paramsSubnets":"[concat(variables('hcSubnetRoot'),'\" \"',variables('frSubnetRoot'),'\" \"',variables('bkSubnetRoot'))]",
     "paramsNbHosts":"[concat('0 \"',parameters('numberOfBack'))]",
     "paramsNames":"[concat(variables('hcVmName'),'\" \"',variables('scVmName'),'\" \"',variables('bkVmName'))]",
     "paramsExtra":"[concat(parameters('prestashop_password'),'\" \"',parameters('dnsNameForFrontPublicIP'),'.',variables('location'))]",
     "paramsAdmin":"[concat(parameters('prestashop_firstname'),'\" \"',parameters('prestashop_lastname'),'\" \"',parameters('prestashop_email'),'\" \"',toLower(parameters('bkVmSize')))]",
     "paramsDeploy":"[concat(parameters('adminUsername'),'\" \"',variables('paramsSubnets'),'\" \"',variables('paramsNbHosts'),'\" \"',variables('paramsNames'),'\" \"',variables('paramsExtra'),'\" \"',variables('paramsAdmin'))]",
-    
+    "osProfile_hc_password":{
+      "computerName":"[variables('hcVmName')]",
+      "adminUsername":"[parameters('adminUsername')]",
+      "adminPassword":"[parameters('adminPassword')]"
+    },
+    "osProfile_hc_sshPublicKey":{
+      "computerName":"[variables('hcVmName')]",
+      "adminUsername":"[parameters('adminUsername')]",
+      "linuxConfiguration":{
+        "disablePasswordAuthentication":"true",
+        "ssh":{
+          "publicKeys":[
+            {
+              "path":"[variables('sshKeyPath')]",
+              "keyData":"[parameters('sshKeyData')]"
+            }
+          ]
+        }
+      }
+    },
     "apiVersion":{
       "resources":{
         "deployments":"2015-01-01"
@@ -169,8 +218,9 @@
       "deployment":"2016-02-01"
     }
   },
-  "resources": [ 
-    { "comments":"OK: Interface for Ansible Control VM with a public IP attached",
+  "resources":[
+    {
+      "comments":"OK: Interface for Ansible Control VM with a public IP attached",
       "apiVersion":"[variables('apiVersion').network]",
       "type":"Microsoft.Network/networkInterfaces",
       "name":"[variables('hcNicName')]",
@@ -181,7 +231,9 @@
       ],
       "properties":{
         "dnsSettings":{
-          "dnsServers": []
+          "dnsServers":[
+
+          ]
         },
         "ipConfigurations":[
           {
@@ -199,7 +251,8 @@
         ]
       }
     },
-    { "comments":"OK: Custom script extension for the Ansible Control VM",
+    {
+      "comments":"OK: Custom script extension for the Ansible Control VM",
       "type":"Microsoft.Compute/virtualMachines/extensions",
       "name":"[concat(variables('hcVmName'),'/installAnsible')]",
       "apiVersion":"[variables('apiVersion').compute]",
@@ -211,7 +264,7 @@
         "publisher":"Microsoft.OSTCExtensions",
         "type":"CustomScriptForLinux",
         "typeHandlerVersion":"1.4",
-        "autoUpgradeMinorVersion": true,
+        "autoUpgradeMinorVersion":true,
         "settings":{
           "fileUris":[
             "[variables('customScriptDeployUrl')]",
@@ -225,12 +278,11 @@
           ]
         },
         "protectedSettings":{
-           "commandToExecute":"[concat(variables('customScriptAnsibleCommand'),' \"',variables('keyStorageAccountName'),'\" \"',listKeys(concat('Microsoft.Storage/storageAccounts/', variables('keyStorageAccountName')), '2015-05-01-preview').key1,'\" \"',variables('paramsDeploy'),'\"')]"
+          "commandToExecute":"[concat(variables('customScriptAnsibleCommand'),' \"',parameters('keyStorageAccountName'),'\" \"',listKeys(concat('Microsoft.Storage/storageAccounts/', parameters('keyStorageAccountName')), '2015-05-01-preview').key1,'\" \"',variables('paramsDeploy'),'\"')]"
         }
       }
     },
-
-   {
+    {
       "comments":"Ansible Contol VM plays the playbook to provision the LAMP cluster",
       "apiVersion":"[variables('apiVersion').compute]",
       "type":"Microsoft.Compute/virtualMachines",
@@ -238,14 +290,14 @@
       "location":"[variables('location')]",
       "dependsOn":[
         "[concat('Microsoft.Storage/storageAccounts/', toLower(parameters('hcStorageAccountName')) ) ]",
-        "[concat('Microsoft.Storage/storageAccounts/', toLower(variables('keyStorageAccountName')) )]",
+        "[concat('Microsoft.Storage/storageAccounts/', toLower(parameters('keyStorageAccountName')) )]",
         "[concat('Microsoft.Network/networkInterfaces/', variables('hcNicName'))]"
       ],
       "properties":{
         "hardwareProfile":{
           "vmSize":"[parameters('hcVmSize')]"
         },
-        "osProfile": "[variables(concat('osProfile_hc_', parameters('authenticationType')))]",
+        "osProfile":"[variables(concat('osProfile_hc_', parameters('authenticationType')))]",
         "storageProfile":{
           "imageReference":{
             "publisher":"[variables('imagePublisher')]",
@@ -256,7 +308,7 @@
           "osDisk":{
             "name":"osdisk",
             "vhd":{
-              "uri":"[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('hcStorageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).primaryEndpoints.blob, variables('hcVmStorageAccountContainerName'),'/', variables('hcOSDiskName'), '.vhd')]"
+              "uri":"[concat(reference(concat('Microsoft.Storage/storageAccounts/', parameters('hcStorageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).primaryEndpoints.blob, variables('hcVmStorageAccountContainerName'),'/', variables('hcOSDiskName'), '.vhd')]"
             },
             "caching":"ReadWrite",
             "createOption":"FromImage"
@@ -272,20 +324,16 @@
         "diagnosticsProfile":{
           "bootDiagnostics":{
             "enabled":"true",
-            "storageUri":"[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('hcStorageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).primaryEndpoints.blob)]"
+            "storageUri":"[concat(reference(concat('Microsoft.Storage/storageAccounts/', parameters('hcStorageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).primaryEndpoints.blob)]"
           }
         }
       }
     }
-
-
-
-
   ],
-  "outputs": {
-    "Ansible FQDN": {
-      "value": "[concat(parameters('dnsNameForAnsiblePublicIP'),'.',variables('location'),'.cloudapp.azure.com')]",
-      "type": "string" 
-    },
-   }
+  "outputs":{
+    "Ansible FQDN":{
+      "value":"[concat(parameters('dnsNameForAnsiblePublicIP'),'.',variables('location'),'.cloudapp.azure.com')]",
+      "type":"string"
+    }
+  }
 }

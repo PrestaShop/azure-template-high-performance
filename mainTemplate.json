@@ -43,7 +43,6 @@
         "description":"Public IP address for web-front LB "
       }
     },
-  
     "adminUserName":{
       "type":"string",
       "metadata":{
@@ -58,7 +57,7 @@
         "sshPublicKey"
       ]
     },
-    "hcPassword": {
+    "adminPassword": {
       "type": "securestring",
       "defaultValue": "", 
       "metadata": {
@@ -404,26 +403,38 @@
           "adminUserName":{
             "value":"[parameters('adminUserName')]"
           },
+          "adminPassword":{
+            "value":"[parameters('adminPassword')]"
+          },
           "sshKeyData":{
             "value":"[parameters('sshKeyData')]"
           },
-          "ubuntuOSVersion":{
-            "value":"[variables('ubuntuOSVersion')]"
-          },
-          "hcVmSize":{
-            "value":"[parameters('hcVmSize')]"
+          "authenticationType":{
+            "value":"[parameters('authenticationType')]"
           },
           "hcStorageAccountName":{
             "value":"[parameters('hcStorageAccountName')]"
           },
-          "bkStorageAccountType":{
-            "value":"[parameters('bkStorageAccountType')]"
+          "dnsNameForAnsiblePublicIP":{
+            "value":"[parameters('dnsNameForAnsiblePublicIP')]"
           },
-          "subnetCIDR":{
-            "value":"[variables('subnetCIDR')]"
+          "hcPublicIPAddressName":{
+            "value":"[parameters('hcPublicIPAddressName')]"
           },
-          "bkSubnetRoot":{
-            "value":"[variables('bkSubnetRoot')]"
+          "virtualNetworkName":{
+            "value":"[parameters('virtualNetworkName')]"
+          },
+          "hcSubnetName":{
+            "value":"[parameters('hcSubnetName')]"
+          },
+          "hcSubnetPrefix":{
+            "value":"[parameters('hcSubnetPrefix')]"
+          },
+          "scSubnetName":{
+            "value":"[parameters('scSubnetName')]"
+          },
+          "scSubnetPrefix":{
+            "value":"[parameters('scSubnetPrefix')]"
           },
           "bkSubnetName":{
             "value":"[parameters('bkSubnetName')]"
@@ -431,27 +442,36 @@
           "bkSubnetPrefix":{
             "value":"[parameters('bkSubnetPrefix')]"
           },
-          "vnetID":{
-            "value":"[variables('vnetID')]"
+          "numberOfBack":{
+            "value":"[parameters('numberOfBack')]"
           },
-          "bkVmName":{
-            "value":"[variables('bkVmName')]"
+          "prestashop_firstname":{
+            "value":"[parameters('prestashop_firstname')]"
           },
-          "shopSize":{
-            "value":"[parameters('shopSize')]"
+          "prestashop_lastname":{
+            "value":"[parameters('prestashop_lastname')]"
+          },
+          "prestashop_email":{
+            "value":"[parameters('prestashop_email')]"
+          },
+          "prestashop_password":{
+            "value":"[parameters('prestashop_password')]"
+          },
+          "dnsNameForFrontPublicIP":{
+            "value":"[parameters('dnsNameForFrontPublicIP')]"
+          },
+          "bkVmSize":{
+            "value":"[parameters('bkVmSize')]"
+          },
+           "hcVmSize":{
+            "value":"[parameters('hcVmSize')]"
           },
           "keyStorageAccountName":{
             "value":"[variables('keyStorageAccountName')]"
           }
         }
       }
-    }
-
-
-
-
-
-
+    },
 
     {"comments": "TODO: Scale set front deployment resource",
       "name":"FrontDeployment",
