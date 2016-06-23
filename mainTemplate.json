@@ -296,7 +296,7 @@
   "resources":[
     {
       "comments":"OK: Shared resource deployment",
-      "name":"FrontDeployment",
+      "name":"SharedDeployment",
       "type":"Microsoft.Resources/deployments",
       "apiVersion":"[variables('apiVersion').deployment]",
       "dependsOn":[
