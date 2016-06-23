@@ -111,7 +111,7 @@
     "bkPublicIPAddressType":"Dynamic",
     "vnetID":"[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
     "bkSubnetRef":"[concat(variables('vnetID'),'/subnets/',parameters('bkSubnetName'))]",
-    "scriptsBaseUrl":"https://raw.githubusercontent.com/herveleclerc/arm-lamp/master/scripts/",
+    "scriptsBaseUrl":"https://raw.githubusercontent.com/PrestaShop/azure-template-high-performance/master/scripts/",
     "customScriptDeployFile":"deploy-back.sh",
     "customScriptDeployUrl":"[concat(variables('scriptsBaseUrl'),variables('customScriptDeployFile'))]",
     "customScriptBackCommand":"[concat('bash ',variables('customScriptDeployFile'))]",
@@ -195,7 +195,7 @@
       "properties":{
         "publisher":"Microsoft.OSTCExtensions",
         "type":"CustomScriptForLinux",
-        "typeHandlerVersion":"1.4",
+        "typeHandlerVersion":"1.5",
         "autoUpgradeMinorVersion": true,
         "settings":{
           "fileUris":[

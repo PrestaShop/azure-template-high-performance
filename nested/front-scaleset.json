@@ -112,6 +112,7 @@
     }
   },
   "variables":{
+    "scriptsBaseUrl":"https://raw.githubusercontent.com/PrestaShop/azure-template-high-performance/master/scripts/",
     "location":"[resourceGroup().location]",
     "newStorageAccountSuffix":"[concat(parameters('scVmName'), 'sa')]",
     "nicName":"[concat(parameters('scVmName'), 'nic')]",
@@ -240,10 +241,10 @@
                   "autoUpgradeMinorVersion":true,
                   "settings":{
                     "fileUris":[
-                      "[concat(parameters('templatesBaseURL'),'/scripts/deploy.sh')]",
-                      "[concat(parameters('templatesBaseURL'),'/scripts/deploy.yml')]"
+                      "[concat(variables('scriptsBaseUrl'),'/deploy-scaleset.sh')]",
+                      "[concat(variables('scriptsBaseUrl'),'/deploy-scaleset.yml')]"
                     ],  
-                    "commandToExecute": "[concat('/bin/bash deploy.sh ', parameters('instanceCount') )]"
+                    "commandToExecute": "[concat('/bin/bash deploy-scaleset.sh ', parameters('instanceCount') )]"
                   }
                 }
               },

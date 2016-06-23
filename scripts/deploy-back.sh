@@ -226,7 +226,8 @@ ssh_config_root
 add_host_entry
 
 # Script Wait for the wait_module from ansible playbook
-start_nc
+# For debugging nc is disabled
+# start_nc
 
 log "Success : End of Execution of Install Script from CustomScript"
 
