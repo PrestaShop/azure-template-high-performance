@@ -150,6 +150,12 @@
         "description":"back Subnet Prefix"
       }
     },
+    "bkAvailabilitySetName":{
+      "type":"string",
+      "metadata": {
+        "description":"Name of availability set"
+      }
+    },
     "dnsNameForFrontPublicIP":{
       "type":"string",
       "metadata":{
@@ -158,7 +164,6 @@
     } 
   },
   "variables": {
-    "bkAvailabilitySetName":"[concat('bkAv', resourceGroup().name)]",
     "bkFaultDomainCount":"2",
     "bkUpdateDomainCount":"3",
     "scSaCount":5,
@@ -191,7 +196,7 @@
   "resources": [
     { "comments":"OK: Availability Set for Back VMs",
       "type": "Microsoft.Compute/availabilitySets",
-      "name": "[variables('bkAvailabilitySetName')]",
+      "name": "[parameters('bkAvailabilitySetName')]",
       "apiVersion": "[variables('apiVersion').network]",
       "location": "[resourceGroup().location]",
       "properties": {

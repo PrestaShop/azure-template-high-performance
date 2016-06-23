@@ -291,6 +291,7 @@
     "hcVmName":"[concat('ans', resourceGroup().name)]",
     "scVmName":"[concat('web', resourceGroup().name)]",
     "bkVmName":"[concat('bdd', resourceGroup().name)]",
+    "bkAvailabilitySetName":"[concat('bkav', resourceGroup().name)]",
 
     "hcSubnetRoot":"[concat( split(parameters('hcSubnetPrefix'), '.')[0], '.', split(parameters('hcSubnetPrefix'), '.')[1], '.', split(parameters('hcSubnetPrefix'), '.')[2])]",
     "scSubnetRoot":"[concat( split(parameters('scSubnetPrefix'), '.')[0], '.', split(parameters('scSubnetPrefix'), '.')[1], '.', split(parameters('scSubnetPrefix'), '.')[2])]",
@@ -552,13 +553,13 @@
         }
       }
     },
-    {
+    { "comments": "TODO: Scale set front deployment resource",
       "name":"BackDeployment",
       "type":"Microsoft.Resources/deployments",
       "apiVersion":"[variables('apiVersion').deployment]",
       "dependsOn":[
         "[concat('Microsoft.Storage/storageAccounts/', toLower(variables('keyStorageAccountName')))]",
-        "[concat('Microsoft.Network/networkSecurityGroups/',variables('bkNetworkSecurityGroupName'))]",
+        "[concat('Microsoft.Network/networkSecurityGroups/',parameters('bkNetworkSecurityGroupName'))]",
         "[concat('Microsoft.Network/virtualNetworks/',parameters('virtualNetworkName'))]"
       ],
       "properties":{
@@ -581,7 +582,7 @@
             "value":"[parameters('bkVmSize')]"
           },
           "numberOfBack":{
-            "value":"[parameters('numberOfFront')]"
+            "value":"[parameters('numberOfBack')]"
           },
           "bkAvailabilitySetName":{
             "value":"[variables('bkAvailabilitySetName')]"
@@ -592,9 +593,6 @@
           "bkStorageAccountType":{
             "value":"[parameters('bkStorageAccountType')]"
           },
-          "subnetCIDR":{
-            "value":"[variables('subnetCIDR')]"
-          },
           "bkSubnetRoot":{
             "value":"[variables('bkSubnetRoot')]"
           },
@@ -604,8 +602,8 @@
           "bkSubnetPrefix":{
             "value":"[parameters('bkSubnetPrefix')]"
           },
-          "vnetID":{
-            "value":"[variables('vnetID')]"
+          "virtualNetworkName":{
+            "value":"[parameters('virtualNetworkName')]"
           },
           "bkVmName":{
             "value":"[variables('bkVmName')]"
@@ -618,7 +616,16 @@
           }
         }
       }
-    },
+    }
   ],
-  "outputs": { }
+  "outputs": {
+    "Ansible FQDN": {
+      "value": "[concat(parameters('dnsNameForAnsiblePublicIP'),'.',variables('location'),'.cloudapp.azure.com')]",
+      "type": "string" 
+    },
+    "SHOP FQDN": {
+      "value": "[concat(parameters('dnsNameForFrontPublicIP'),'.',variables('location'),'cloudapp.azure.com')]",
+      "type": "string" 
+    }
+   }
 }

@@ -50,12 +50,6 @@
         "description":"Account type"
       }
     },
-    "subnetCIDR":{
-      "type":"string",
-      "metadata":{
-        "description":"Subnet Suffix"
-      }
-    },
     "bkSubnetRoot":{
       "type":"string"
     },
@@ -71,10 +65,10 @@
         "description":"Subnet IP block"
       }
     },
-    "vnetID":{
+    "virtualNetworkName":{
       "type":"string",
       "metadata":{
-        "description":"vnet ID"
+        "description":"Virtual Network Name"
       }
     },
     "bkVmName":{
@@ -109,7 +103,8 @@
     "bkNicName":"bkVnic",
     "bkPublicIPAddressName":"bkPublicIP",
     "bkPublicIPAddressType":"Dynamic",
-    "bkSubnetRef":"[concat(parameters('vnetID'),'/subnets/',parameters('bkSubnetName'))]",
+    "vnetID":"[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
+    "bkSubnetRef":"[concat(variables('vnetID'),'/subnets/',parameters('bkSubnetName'))]",
     "scriptsBaseUrl":"https://raw.githubusercontent.com/herveleclerc/arm-lamp/master/scripts/",
     "customScriptDeployFile":"deploy-back.sh",
     "customScriptDeployUrl":"[concat(variables('scriptsBaseUrl'),variables('customScriptDeployFile'))]",
