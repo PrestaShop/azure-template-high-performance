@@ -299,7 +299,7 @@ configure_ansible
 get_roles
 configure_deployment
 create_extra_vars
-deploy_cluster
+#deploy_cluster
 
 log "Success : End of Execution of Install Script from CustomScript"
 

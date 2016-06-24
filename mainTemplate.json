@@ -507,7 +507,7 @@
       "properties":{
         "mode":"Incremental",
         "templateLink":{
-          "uri":"[variables('configuration').frontTemplateURL]",
+          "uri":"[variables('configuration').scfrTemplateURL]",
           "contentVersion":"1.0.0.0"
         },
         "parameters":{
