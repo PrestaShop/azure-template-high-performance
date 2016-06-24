@@ -185,7 +185,7 @@
     "hcOSDiskName":"hcosdisk",
     "scriptsBaseUrl":"https://raw.githubusercontent.com/PrestaShop/azure-template-high-performance/master/scripts/",
     
-    
+    "numberOfFront":"100",
     "ansiblePlaybookLocation":"deploy-prestashop.yml",
     "ansibleRolesReqLocation":"install_roles.yml",
     "ansibleVarsLocation":"vars/main.yml",
@@ -207,7 +207,7 @@
     "frSubnetRoot":"[concat( split(parameters('scSubnetPrefix'), '.')[0], '.', split(parameters('scSubnetPrefix'), '.')[1], '.', split(parameters('scSubnetPrefix'), '.')[2])]",
     "bkSubnetRoot":"[concat( split(parameters('bkSubnetPrefix'), '.')[0], '.', split(parameters('bkSubnetPrefix'), '.')[1], '.', split(parameters('bkSubnetPrefix'), '.')[2])]",
     "paramsSubnets":"[concat(variables('hcSubnetRoot'),'\" \"',variables('frSubnetRoot'),'\" \"',variables('bkSubnetRoot'))]",
-    "paramsNbHosts":"[concat('0 \"',parameters('numberOfBack'))]",
+    "paramsNbHosts":"[concat(variables('numberOfFront'),'\" \"',parameters('numberOfBack'))]",
     "paramsNames":"[concat(parameters('hcVmName'),'\" \"',parameters('scVmName'),'\" \"',parameters('bkVmName'))]",
     "paramsExtra":"[concat(parameters('prestashop_password'),'\" \"',parameters('dnsNameForFrontPublicIP'),'.',variables('location'))]",
     "paramsAdmin":"[concat(parameters('prestashop_firstname'),'\" \"',parameters('prestashop_lastname'),'\" \"',parameters('prestashop_email'),'\" \"',toLower(parameters('bkVmSize')))]",

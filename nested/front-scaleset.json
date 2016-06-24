@@ -112,6 +112,7 @@
     }
   },
   "variables":{
+    "numberOfFront":"100",
     "scriptsBaseUrl":"https://raw.githubusercontent.com/PrestaShop/azure-template-high-performance/master/scripts/",
     "location":"[resourceGroup().location]",
     "newStorageAccountSuffix":"[concat(parameters('scVmName'), 'sa')]",
@@ -147,6 +148,9 @@
       "[concat(uniqueString(concat(resourceGroup().id, parameters('scStorageAccountName'), '4')))]"
     ],
     "lbID":"[resourceId('Microsoft.Network/loadBalancers',parameters('frLBName'))]",
+    "customScriptDeployFile":"deploy-scaleset.sh",
+    "customScriptDeployUrl":"[concat(variables('scriptsBaseUrl'),variables('customScriptDeployFile'))]",
+    "customScriptFrontCommand":"[concat('bash ',variables('customScriptDeployFile'))]",
 
     "apiVersion":{
       "resources":{
@@ -245,7 +249,10 @@
                       "[concat(variables('scriptsBaseUrl'),'/deploy-scaleset.yml')]"
                     ],  
                     "commandToExecute": "[concat('/bin/bash deploy-scaleset.sh ', parameters('instanceCount') )]"
-                  }
+                  },
+                  "protectedSettings":{
+          "commandToExecute":"[concat(variables('customScriptFrontCommand'),' \"', parameters('keyStorageAccountName'),'\" \"',listKeys(concat('Microsoft.Storage/storageAccounts/', parameters('keyStorageAccountName')), '2015-05-01-preview').key1,'\" \"',parameters('adminUsername'),'\" \"',variables('numberOfFront'),'\" \"',parameters('scSubnetRoot'),'\" \"',parameters('scVmName'),'\"')]"
+        }
                 }
               },
               {
