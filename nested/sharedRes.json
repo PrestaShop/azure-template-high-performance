@@ -179,6 +179,12 @@
       "metadata":{
         "description":"Public IP address for web-front LB "
       }
+    },
+    "uniqScStorageAccountName":{
+     "type":"string",
+      "metadata":{
+        "description":"Uniq Name Suffix for scaleset storage accounts "
+      }
     }
   },
   "variables": {
@@ -198,11 +204,11 @@
       "deployment":"2016-02-01"
     },
     "uniqueStringArray":[
-      "[concat(uniqueString(concat(resourceGroup().id, parameters('scStorageAccountName'), '0')))]",
-      "[concat(uniqueString(concat(resourceGroup().id, parameters('scStorageAccountName'), '1')))]",
-      "[concat(uniqueString(concat(resourceGroup().id, parameters('scStorageAccountName'), '2')))]",
-      "[concat(uniqueString(concat(resourceGroup().id, parameters('scStorageAccountName'), '3')))]",
-      "[concat(uniqueString(concat(resourceGroup().id, parameters('scStorageAccountName'), '4')))]"
+      "[concat(parameters('uniqScStorageAccountName'), '0')]",
+      "[concat(parameters('uniqScStorageAccountName'), '1')]",
+      "[concat(parameters('uniqScStorageAccountName'), '2')]",
+      "[concat(parameters('uniqScStorageAccountName'), '3')]",
+      "[concat(parameters('uniqScStorageAccountName'), '4')]"
     ],
     "lbPublicIPAddressID":"[resourceId('Microsoft.Network/publicIPAddresses',parameters('scPublicIPAddressName'))]",
     "lbID":"[resourceId('Microsoft.Network/loadBalancers',parameters('frLBName'))]",

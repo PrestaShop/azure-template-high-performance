@@ -109,6 +109,12 @@
       "metadata":{
         "description":"Storage Account Name for diags"
       }      
+    },
+    "uniqScStorageAccountName":{
+     "type":"string",
+      "metadata":{
+        "description":"Uniq Name Suffix for scaleset storage accounts"
+      }
     }
   },
   "variables":{
@@ -139,13 +145,12 @@
     "wadcfgxstart": "[concat(variables('wadlogs'),variables('wadperfcounters1'),variables('wadperfcounters2'),'<Metrics resourceId=\"')]",
     "wadmetricsresourceid": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name ,'/providers/','Microsoft.Compute/virtualMachineScaleSets/',parameters('scVmName'))]",
     "wadcfgxend": "[concat('\"><MetricAggregation scheduledTransferPeriod=\"PT1H\"/><MetricAggregation scheduledTransferPeriod=\"PT1M\"/></Metrics></DiagnosticMonitorConfiguration></WadCfg>')]",
-
     "uniqueStringArray":[
-      "[concat(uniqueString(concat(resourceGroup().id, parameters('scStorageAccountName'), '0')))]",
-      "[concat(uniqueString(concat(resourceGroup().id, parameters('scStorageAccountName'), '1')))]",
-      "[concat(uniqueString(concat(resourceGroup().id, parameters('scStorageAccountName'), '2')))]",
-      "[concat(uniqueString(concat(resourceGroup().id, parameters('scStorageAccountName'), '3')))]",
-      "[concat(uniqueString(concat(resourceGroup().id, parameters('scStorageAccountName'), '4')))]"
+      "[concat(parameters('uniqScStorageAccountName'), '0')]",
+      "[concat(parameters('uniqScStorageAccountName'), '1')]",
+      "[concat(parameters('uniqScStorageAccountName'), '2')]",
+      "[concat(parameters('uniqScStorageAccountName'), '3')]",
+      "[concat(parameters('uniqScStorageAccountName'), '4')]"
     ],
     "lbID":"[resourceId('Microsoft.Network/loadBalancers',parameters('frLBName'))]",
     "customScriptDeployFile":"deploy-scaleset.sh",
