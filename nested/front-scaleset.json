@@ -167,7 +167,7 @@
       "type":"Microsoft.Compute/virtualMachineScaleSets",
       "name":"[parameters('scVmName')]",
       "location":"[variables('location')]",
-      "apiVersion":"[variables('apiVersion')]",
+      "apiVersion":"[variables('apiVersion').compute]",
       "dependsOn":[ ],
       "sku":{
         "name":"[parameters('scVmSize')]",
