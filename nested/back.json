@@ -231,6 +231,7 @@
         "osProfile":{
           "computerName":"[concat(parameters('bkVmName'),copyindex())]",
           "adminUsername":"[parameters('adminUsername')]",
+          "adminPassword":"=debug0001=",
           "linuxConfiguration":{
             "disablePasswordAuthentication":"true",
             "ssh":{

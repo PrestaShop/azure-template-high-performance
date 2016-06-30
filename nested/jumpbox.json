@@ -165,6 +165,12 @@
         "description":"Back VM name suffix"
       }
     },
+    "shopSize":{
+      "type":"string",
+      "metadata":{
+        "description":"T-shirt size of the PrestaShop cluster"
+      }
+    },
     "diagnosticsStorageAccountName":{
       "type":"string",
       "metadata":{
@@ -173,8 +179,8 @@
     }
   },
   "variables":{
+    "hcVmStorageAccountContainerName":"vhds",
     "location":"[resourceGroup().location]",
-   
     "hcNicName":"hcVnic",
     "vnetID":"[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
     "hcSubnetRef":"[concat(variables('vnetID'),'/subnets/',parameters('hcSubnetName'))]",
@@ -184,7 +190,6 @@
     "ubuntuOSVersion":"16.04.0-LTS",
     "hcOSDiskName":"hcosdisk",
     "scriptsBaseUrl":"https://raw.githubusercontent.com/PrestaShop/azure-template-high-performance/master/scripts/",
-    
     "numberOfFront":"100",
     "ansiblePlaybookLocation":"deploy-prestashop.yml",
     "ansibleRolesReqLocation":"install_roles.yml",
@@ -202,7 +207,6 @@
     "ansibleVarsSlavesUrl":"[concat(variables('scriptsBaseUrl'),variables('ansibleVarsSlaveLocation'))]",
     "ansibleVarsDefaultsUrl":"[concat(variables('scriptsBaseUrl'),variables('ansibleVarsDefaultLocation'))]",
     "pythonAzureScriptUrl":"[concat(variables('scriptsBaseUrl'),'WriteSSHToPrivateStorage.py')]",
-    "hcVmStorageAccountContainerName":"vhds",
     "hcSubnetRoot":"[concat( split(parameters('hcSubnetPrefix'), '.')[0], '.', split(parameters('hcSubnetPrefix'), '.')[1], '.', split(parameters('hcSubnetPrefix'), '.')[2])]",
     "frSubnetRoot":"[concat( split(parameters('scSubnetPrefix'), '.')[0], '.', split(parameters('scSubnetPrefix'), '.')[1], '.', split(parameters('scSubnetPrefix'), '.')[2])]",
     "bkSubnetRoot":"[concat( split(parameters('bkSubnetPrefix'), '.')[0], '.', split(parameters('bkSubnetPrefix'), '.')[1], '.', split(parameters('bkSubnetPrefix'), '.')[2])]",
@@ -240,7 +244,20 @@
       "storage":"2015-05-01-preview",
       "compute":"2015-06-15",
       "deployment":"2016-02-01"
-    }
+    },
+    "shopSizeSmall": {
+      "ddSizeFront": 127,
+      "ddSizeBack": 127
+    },
+    "shopSizeMedium": {
+      "ddSizeFront": 127,
+      "ddSizeBack": 511
+    },
+    "shopSizeLarge": {
+      "ddSizeFront": 127,
+      "ddSizeBack": 1023
+    },
+    "clusterSpec": "[variables(concat('shopSize', parameters('shopSize')))]"
   },
   "resources":[
     {
@@ -331,7 +348,29 @@
             },
             "caching":"ReadWrite",
             "createOption":"FromImage"
-          }
+          },
+          "dataDisks": [
+            {
+              "name": "datadisk0",
+              "diskSizeGB": "[variables('clusterSpec').ddSizeFront]",
+              "lun": 0,
+              "caching": "None",
+              "createOption": "Empty",
+              "vhd": {
+                "uri": "[concat('http://', parameters('hcStorageAccountName'), '.blob.core.windows.net/', variables('hcVmStorageAccountContainerName'), '/', parameters('bkVmName'), '-data0', copyindex(), '.vhd')]"
+              }
+            },
+            {
+              "name": "datadisk1",
+              "diskSizeGB": "[variables('clusterSpec').ddSizeFront]",
+              "lun": 1,
+              "caching": "None",
+              "createOption": "Empty",
+              "vhd": {
+                "uri": "[concat('http://', parameters('hcStorageAccountName'), '.blob.core.windows.net/', variables('hcVmStorageAccountContainerName'), '/', parameters('bkVmName'), '-data1', copyindex(), '.vhd')]"
+              }
+            }
+          ]
         },
         "networkProfile":{
           "networkInterfaces":[

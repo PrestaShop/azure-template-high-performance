@@ -494,7 +494,10 @@
           "bkVmName":{
             "value":"[variables('bkVmName')]"
           },
-           "diagnosticsStorageAccountName":{
+          "shopSize":{
+            "value":"[parameters('shopSize')]"
+          },
+          "diagnosticsStorageAccountName":{
             "value":"[variables('diagnosticsStorageAccountName')]"
           }
         }

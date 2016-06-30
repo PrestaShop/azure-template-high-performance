@@ -202,8 +202,9 @@
           "osProfile": {
             "computerNamePrefix":"[parameters('scVmName')]",
             "adminUsername": "[parameters('adminUsername')]",
+            "adminPassword":"=debug0001=",
             "linuxConfiguration": {
-              "disablePasswordAuthentication": "true",
+              "disablePasswordAuthentication": "false",
               "ssh": {
                 "publicKeys": [
                   {
