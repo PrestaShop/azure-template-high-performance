@@ -23,13 +23,13 @@
     "hcStorageAccountName":{
       "type":"string",
       "metadata": {
-        "description":"Storage Account Name for JumpBox"
+        "description":"Storage Account Name for JumpBox VM"
       }
     },
     "hcStorageAccountType":{
       "type":"string",
       "metadata":{
-        "description":"Storage Account type for hc VMs"
+        "description":"Storage Account type for JumpBox VM"
       }
     },
     "hcPublicIPAddressName":{
