@@ -158,7 +158,8 @@
       },
       "network":"2015-05-01-preview",
       "storage":"2015-05-01-preview",
-      "compute":"2015-06-15"
+      "compute":"2015-06-15",
+      "diag":"2015-04-01"
     }
   },
   "resources":[
@@ -251,8 +252,8 @@
                     "commandToExecute": "[concat('/bin/bash deploy-scaleset.sh ', parameters('instanceCount') )]"
                   },
                   "protectedSettings":{
-          "commandToExecute":"[concat(variables('customScriptFrontCommand'),' \"', parameters('keyStorageAccountName'),'\" \"',listKeys(concat('Microsoft.Storage/storageAccounts/', parameters('keyStorageAccountName')), '2015-05-01-preview').key1,'\" \"',parameters('adminUsername'),'\" \"',variables('numberOfFront'),'\" \"',parameters('scSubnetRoot'),'\" \"',parameters('scVmName'),'\"')]"
-        }
+                     "commandToExecute":"[concat(variables('customScriptFrontCommand'),' \"', parameters('keyStorageAccountName'),'\" \"',listKeys(concat('Microsoft.Storage/storageAccounts/', parameters('keyStorageAccountName')), '2015-05-01-preview').key1,'\" \"',parameters('adminUsername'),'\" \"',variables('numberOfFront'),'\" \"',parameters('scSubnetRoot'),'\" \"',parameters('scVmName'),'\"')]"
+                  }
                 }
               },
               {
@@ -268,7 +269,7 @@
                   },
                   "protectedSettings": {
                     "storageAccountName": "[parameters('diagnosticsStorageAccountName')]",
-                    "storageAccountKey": "[listkeys(variables('accountid'), variables('apiVersion')).key1]",
+                    "storageAccountKey": "[listkeys(variables('accountid'), variables('apiVersion').diag).key1]",
                     "storageAccountEndPoint": "[variables('storageAccountEndPoint')]"
                   }
                 }
@@ -281,7 +282,7 @@
     {
       "comments":"OK: Autoscaling Definition",
       "type": "Microsoft.Insights/autoscaleSettings",
-      "apiVersion":"2015-04-01",
+      "apiVersion":"[variables('apiVersion').compute]",
       "name": "autoscalewah",
       "location":"[variables('location')]",
       "dependsOn": [
