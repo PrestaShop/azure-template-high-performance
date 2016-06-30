@@ -564,7 +564,7 @@
           },
            "diagnosticsStorageAccountName":{
             "value":"[variables('diagnosticsStorageAccountName')]"
-          },
+          }
         }
       }
     },
