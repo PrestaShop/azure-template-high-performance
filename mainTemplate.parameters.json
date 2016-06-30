@@ -33,7 +33,7 @@
     "value": "Standard_DS1"
   },
   "hcStorageAccountName": {
-    "value": "jumboxahl"
+    "value": "jumpboxahl"
   },
   "hcStorageAccountType": {
     "value": "Premium_LRS"
