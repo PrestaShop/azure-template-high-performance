@@ -121,7 +121,6 @@
     "numberOfFront":"100",
     "scriptsBaseUrl":"https://raw.githubusercontent.com/PrestaShop/azure-template-high-performance/master/scripts/",
     "location":"[resourceGroup().location]",
-    "newStorageAccountSuffix":"[concat(parameters('scVmName'), 'sa')]",
     "nicName":"[concat(parameters('scVmName'), 'nic')]",
     "ipConfigName":"[concat(parameters('scVmName'), 'ipconfig')]",
     "sshKeyPath": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
@@ -188,11 +187,11 @@
           "storageProfile":{
             "osDisk":{
               "vhdContainers":[
-                "[concat('https://', variables('uniqueStringArray')[0], variables('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]",
-                "[concat('https://', variables('uniqueStringArray')[1], variables('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]",
-                "[concat('https://', variables('uniqueStringArray')[2], variables('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]",
-                "[concat('https://', variables('uniqueStringArray')[3], variables('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]",
-                "[concat('https://', variables('uniqueStringArray')[4], variables('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]"
+                "[concat('https://', variables('uniqueStringArray')[0], toLower(parameters('scStorageAccountName')), '.blob.core.windows.net/', variables('vhdContainerName'))]",
+                "[concat('https://', variables('uniqueStringArray')[1], toLower(parameters('scStorageAccountName')), '.blob.core.windows.net/', variables('vhdContainerName'))]",
+                "[concat('https://', variables('uniqueStringArray')[2], toLower(parameters('scStorageAccountName')), '.blob.core.windows.net/', variables('vhdContainerName'))]",
+                "[concat('https://', variables('uniqueStringArray')[3], toLower(parameters('scStorageAccountName')), '.blob.core.windows.net/', variables('vhdContainerName'))]",
+                "[concat('https://', variables('uniqueStringArray')[4], toLower(parameters('scStorageAccountName')), '.blob.core.windows.net/', variables('vhdContainerName'))]"
               ],
               "name":"[variables('osDiskName')]",
               "caching":"ReadOnly",
