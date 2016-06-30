@@ -102,14 +102,14 @@
     "hcStorageAccountName":{
       "type":"string",
       "metadata":{
-        "description":"Storage Account Name for JumpBox"
+        "description":"Storage Account Name for JumpBox VM"
       }
     },
     "hcStorageAccountType":{
       "type":"string",
       "defaultValue":"Premium_LRS",
       "metadata":{
-        "description":"Storage Account type for hc VMs"
+        "description":"Storage Account type for Jumpbox VM"
       }
     },
     "scStorageAccountName":{
