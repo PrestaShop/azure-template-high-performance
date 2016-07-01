@@ -1,4 +1,4 @@
-- hosts: cluster
+- hosts: back
   become: True
   gather_facts: false
 
@@ -6,52 +6,10 @@
   - name: "Wait for port 3333 to be ready"
     local_action: wait_for port=3333 host="{{ inventory_hostname }}" state=started connect_timeout=2 timeout=600
 
-- hosts: cluster
-  become: True
-  gather_facts: true
-  vars_files:
-    - vars/main.yml
-    
-  roles:      
-    - { role: ansible-init-raid }   
-
-- hosts: front
-  become: True
-  vars_files:
-    - vars/main.yml
-  pre_tasks:
-    - name: "Create root prestashop directory for archive"
-      file: path="{{ documentroot }}" state=directory mode="u=rwx,g=rx,o=rx" owner="{{ prestashop_owner }}" group="{{ prestashop_group }}"
-    
-    - name: "Install missing package if needed"
-      apt: name={{ item }} update_cache=yes
-      with_items:
-        - unzip
-        
-  roles:
-    - { role: geerlingguy.apache }
-    - { role: geerlingguy.php }
-    - { role: geerlingguy.apache-php-fpm  }
-    - { role: carlosbuenosvinos.ansistrano-deploy }
-
-# Specifics task for sync 
-- hosts: front
-  become: True
-  vars_files:
-    - vars/main.yml
-
-  pre_tasks:
-    - name: "Change files permission on {{ documentroot }}" 
-      file: dest="{{ documentroot }}" state=directory 
-            owner="{{ prestashop_owner }}" group="{{ prestashop_group }}"
-            recurse=yes
-            
-  roles:      
-    - { role: ansible-csync2-lsyncd }   
-            
 # Instalation of Mysql Cluster M/S   
 - hosts: back
   become: True
+  gather_facts: true
   vars_files:
     - vars/main.yml
   
@@ -61,41 +19,6 @@
         mysql_replication_master: "{{ groups['master'][0] }}"
 
   roles:
+    - { role: ansible-init-raid }   
     - { role: ansible-role-mysql }  
-    
-- hosts: front
-  become: True
-  gather_facts: True
-  vars_files:
-    - vars/main.yml
-
-  tasks:
-    - name: "Reload lsyncd"
-      service: name=lsyncd state=restarted
-
-    - name: "Install prestashop default shop"
-      command: >
-        php {{ prestashop_dir }}/install/index_cli.php
-        --domain="{{ prestashop_lb_name }}{{ azure_suffix }}"
-        --db_server="{{ groups['master'][0] }}"
-        --db_name="{{ prestashop_dbname }}"
-        --db_user="{{ prestashop_user }}"
-        --db_password="{{ prestashop_password }}"
-        --firstname="{{ prestashop_firstname }}"
-        --lastname="{{ prestashop_lastname }}"
-        --password="{{ prestashop_password }}"
-        --email="{{ prestashop_email }}"
-        --newsletter=0
-        --send_email=0
-      when: inventory_hostname == "{{ groups['front'][0] }}"
-      register: php_result
-        
-    - name: "Remove Install Directory"
-      file: path="{{ prestashop_dir }}/install" state=absent
-      when: php_result is defined and ( inventory_hostname == "{{ groups['front'][0] }}" and php_result.rc == 0 )
-      
-    - name: "Finalize files permission on {{ documentroot }}" 
-      file: dest="{{ documentroot }}" state=directory 
-            owner="{{ prestashop_owner }}" group="{{ prestashop_group }}"
-            recurse=yes 
-      
+  

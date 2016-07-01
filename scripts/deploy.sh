@@ -165,6 +165,7 @@ function configure_ansible()
   let nBck=${numberOfBack}-1
   # Generate Hostfile for Front and Back
   # All Nodes
+  
   echo "[cluster]"                                                                                                                         >>  "${ANSIBLE_HOST_FILE}"
   echo "${frVmName}[0:$nWeb] ansible_user=${ANSIBLE_USER} ansible_ssh_private_key_file=/home/${ANSIBLE_USER}/.ssh/id_rsa"                  >> "${ANSIBLE_HOST_FILE}"
   echo "${bkVmName}[0:$nBck] ansible_user=${ANSIBLE_USER} ansible_ssh_private_key_file=/home/${ANSIBLE_USER}/.ssh/id_rsa"                  >> "${ANSIBLE_HOST_FILE}"
