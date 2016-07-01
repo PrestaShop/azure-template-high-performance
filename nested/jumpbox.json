@@ -357,7 +357,7 @@
               "caching": "None",
               "createOption": "Empty",
               "vhd": {
-                "uri": "[concat('http://', parameters('hcStorageAccountName'), '.blob.core.windows.net/', variables('hcVmStorageAccountContainerName'), '/', parameters('bkVmName'), '-data0', copyindex(), '.vhd')]"
+                "uri": "[concat('http://', parameters('hcStorageAccountName'), '.blob.core.windows.net/', variables('hcVmStorageAccountContainerName'), '/', parameters('bkVmName'), '-data0.vhd')]"
               }
             },
             {
@@ -367,7 +367,7 @@
               "caching": "None",
               "createOption": "Empty",
               "vhd": {
-                "uri": "[concat('http://', parameters('hcStorageAccountName'), '.blob.core.windows.net/', variables('hcVmStorageAccountContainerName'), '/', parameters('bkVmName'), '-data1', copyindex(), '.vhd')]"
+                "uri": "[concat('http://', parameters('hcStorageAccountName'), '.blob.core.windows.net/', variables('hcVmStorageAccountContainerName'), '/', parameters('bkVmName'), '-data1.vhd')]"
               }
             }
           ]
