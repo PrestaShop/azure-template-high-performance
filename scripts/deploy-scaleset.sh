@@ -273,7 +273,7 @@ function start_nc()
 function deploy_scaleset()
 {
   
-  nfs_mountpoint=$(cat vars/main.yml | awk '/nfs_mountpoint:/ { print $2; }'| tr -d '"')
+  nfs_mountpoint=$(awk '/nfs_mountpoint:/ { print $2; }' vars/main.yml | tr -d '"')
 
   if [ -f "${nfs_mountpoint}/etc/ansible/hosts" ]; then
      INVENTORY_FILE="/data/etc/ansible/hosts"
