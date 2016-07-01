@@ -13,7 +13,19 @@
   tasks:
     - name: "Create root prestashop directory for archive"
       file: path="{{ documentroot }}" state=directory mode="u=rwx,g=rx,o=rx" owner="{{ prestashop_owner }}" group="{{ prestashop_group }}"
-    
+
+    - name: "Create ansible shareable config files"
+      file: path="{{ raid_mountpoint }}/etc/ansible" state=directory mode="u=rwx,g=rx,o=rx" owner="root"
+
+    - name: "Check if hostfile exists" 
+      action: stat path="/etc/ansible/hosts"
+      register: file
+      ignore_errors: True
+
+    - name: "Copy host file to nfs share"
+      copy: src="/etc/ansible/hosts" dest="{{ raid_mountpoint }}/etc/ansible"
+      when: file.stat.exists
+
 - hosts: all
   become: True
   gather_facts: true

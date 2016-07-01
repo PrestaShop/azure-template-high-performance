@@ -253,7 +253,6 @@ function deploy_database_cluster()
   error_log "Fail to deploy front cluster !"
 }
 
-
 function deploy_code()
 {
   ansible-playbook deploy.yml --connection=local -i "localhost," --extra-vars "@${EXTRA_VARS}" > /tmp/ansible-local.log 2>&1
@@ -314,6 +313,7 @@ configure_deployment
 create_extra_vars
 deploy_code
 deploy_database_cluster
+
 
 log "Success : End of Execution of Install Script from CustomScript"
 

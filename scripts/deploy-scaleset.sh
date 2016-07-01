@@ -247,6 +247,7 @@ function configure_deployment()
   error_log "Fail to create group_vars  directory"
   mv main.yml vars/main.yml
   error_log "Fail to move vars file to directory vars"
+
 }
 
 function create_extra_vars()
@@ -272,10 +273,18 @@ function start_nc()
 
 function deploy_scaleset()
 {
-  ansible-playbook deploy-scaleset.yml --connection=local -i "localhost," --extra-vars "@${EXTRA_VARS}" > /tmp/ansible.log 2>&1
+  
+  nfs_mountpoint=$(cat vars/main.yml | awk '/nfs_mountpoint:/ { print $2; }'| tr -d '"')
+
+  if [ -f "${nfs_mountpoint}/etc/ansible/hosts" ]; then
+     INVENTORY_FILE="/data/etc/ansible/hosts"
+  else
+     INVENTORY_FILE="${ANSIBLE_HOST_FILE}"
+  fi 
+
+  ansible-playbook deploy-scaleset.yml --connection=local -i "${INVENTORY_FILE}" --extra-vars "@${EXTRA_VARS}" > /tmp/ansible.log 2>&1
   error_log "Fail to deploy scale set node !"
 }
-
 
 log "Execution of Install Script from CustomScript ..."
 
