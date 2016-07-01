@@ -247,16 +247,16 @@ function create_extra_vars()
   printf "  \"prestashop_password\": \"%s\"\n}" "${prestashop_password}"   >> "${EXTRA_VARS}"
 }
 
-function deploy_cluster()
+function deploy_database_cluster()
 {
-  ansible-playbook deploy-prestashop.yml --extra-vars "@${EXTRA_VARS}" > /tmp/ansible.log 2>&1
+  ansible-playbook deploy-prestashop.yml --extra-vars "@${EXTRA_VARS}" > /tmp/ansible-cluster.log 2>&1
   error_log "Fail to deploy front cluster !"
 }
 
 
 function deploy_code()
 {
-  ansible-playbook deploy.yml --connection=local -i "localhost," --extra-vars "@${EXTRA_VARS}" > /tmp/ansible.log 2>&1
+  ansible-playbook deploy.yml --connection=local -i "localhost," --extra-vars "@${EXTRA_VARS}" > /tmp/ansible-local.log 2>&1
   error_log "Fail to deploy NFS and prestashop code !"
 }
 
@@ -313,7 +313,7 @@ get_roles
 configure_deployment
 create_extra_vars
 deploy_code
-#deploy_cluster
+deploy_database_cluster
 
 log "Success : End of Execution of Install Script from CustomScript"
 
