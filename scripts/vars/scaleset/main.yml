@@ -1,0 +1,67 @@
+
+
+nfs_mountpoint: "/data"
+nfspath: "/data"
+system_devices: "/dev/sda|/dev/sdb"
+
+documentroot: "{{ nfs_mountpoint }}/www/azureshop"
+prestashop_dir: "{{ documentroot }}/current/prestashop"
+
+prestashop_firstname: "herve"
+prestashop_lastname: "leclerc"
+prestashop_email: "herve.leclerc@alterway.fr"
+prestashop_dbname: "prestashop"
+prestashop_user: "prestashop"
+prestashop_password: "prestashop"
+
+prestashop_fqdn: "azureshop.com"
+prestashop_owner: "www-data"
+prestashop_group: "www-data"
+
+azure_suffix: ".cloudapp.azure.com"
+
+apache_remove_default_vhost: true
+apache_listen_port: 80
+apache_listen_port_ssl: 443
+apache_vhosts:
+  - servername:  "{{ prestashop_lb_name }}{{ azure_suffix }}"
+    serveralias: "{{ prestashop_fqdn }}"
+    documentroot: "{{ prestashop_dir }}"
+    extra_parameters: |
+              ProxyPassMatch ^/(.*\.php(/.*)?)$ "fcgi://127.0.0.1:9000{{ prestashop_dir }}"
+   
+apache_mods_enabled:
+  - rewrite.load
+  - actions.load 
+  - alias.load
+  - expires.load
+
+php_enable_php_fpm: true
+php_use_managed_ini: true
+php_opcache_enabled_in_ini: true
+php_opcache_enable: "1"
+php_opcache_enable_cli: "0"
+php_opcache_memory_consumption: "96"
+php_opcache_interned_strings_buffer: "16"
+php_opcache_max_accelerated_files: "4096"
+php_opcache_max_wasted_percentage: "5"
+php_opcache_validate_timestamps: "1"
+php_opcache_revalidate_freq: "2"
+php_opcache_max_file_size: "0"
+
+php_enable_apc: false
+
+# php.ini values
+php_memory_limit: "512M"
+
+php_packages:
+  - php7.0-common
+  - php7.0-cli
+  - php7.0-fpm
+  - php7.0-gd
+  - php7.0-curl
+  - php7.0-opcache
+  - php7.0-xml
+  - php7.0-mbstring
+  - php7.0-mysql
+  - php7.0-mcrypt 

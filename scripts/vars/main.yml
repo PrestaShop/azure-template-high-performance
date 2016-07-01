@@ -97,6 +97,10 @@ raid_mountpoint: "/data"
 raid_device: "/dev/md127"
 system_devices: "/dev/sda|/dev/sdb"
 
+
+nfs_exports: 
+  - "{{ raid_mountpoint }} *(rw,sync,no_root_squash)"
+
 documentroot: "{{ raid_mountpoint }}/www/azureshop"
 prestashop_dir: "{{ documentroot }}/current/prestashop"
 

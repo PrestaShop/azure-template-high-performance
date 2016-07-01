@@ -77,6 +77,30 @@
         "description":"LB Name"
       }
     },
+    "prestashop_firstname":{
+      "type":"string",
+      "metadata":{
+        "description":"Prestatshop Admin Firstname"
+      }
+    },
+    "prestashop_lastname":{
+      "type":"string",
+      "metadata":{
+        "description":"Prestatshop Admin Lastname"
+      }
+    },
+    "prestashop_email":{
+      "type":"string",
+      "metadata":{
+        "description":"Prestatshop Admin email"
+      }
+    },
+    "prestashop_password":{
+      "type":"securestring",
+      "metadata":{
+        "description":"Prestatshop Admin Password"
+      }
+    },
     "instanceCount":{
       "type":"int",
       "defaultValue":"2",
@@ -90,6 +114,9 @@
       "metadata":{
         "description":"Name of the LB"
       }
+    },
+    "hcSubnetRoot":{
+      "type":"string"
     },
     "templatesBaseURL":{
       "type":"string",
@@ -152,9 +179,18 @@
       "[concat(parameters('uniqScStorageAccountName'), '4')]"
     ],
     "lbID":"[resourceId('Microsoft.Network/loadBalancers',parameters('frLBName'))]",
+    "pythonAzureScriptUrl":"[concat(variables('scriptsBaseUrl'),'GetSSHFromPrivateStorage.py')]",
     "customScriptDeployFile":"deploy-scaleset.sh",
     "customScriptDeployUrl":"[concat(variables('scriptsBaseUrl'),variables('customScriptDeployFile'))]",
     "customScriptFrontCommand":"[concat('bash ',variables('customScriptDeployFile'))]",
+    "ansiblePlaybookLocation":"deploy-scaleset.yml",
+    "ansibleRolesReqLocation":"install_roles_scaleset.yml",
+    "ansibleVarsLocation":"vars/scaleset/main.yml",
+    "ansiblePlaybookUrl":"[concat(variables('scriptsBaseUrl'),variables('ansiblePlaybookLocation'))]",
+    "ansibleRolesReqUrl":"[concat(variables('scriptsBaseUrl'),variables('ansibleRolesReqLocation'))]",
+    "ansibleVarsUrl":"[concat(variables('scriptsBaseUrl'),variables('ansibleVarsLocation'))]",
+    "paramsExtra":"[concat(parameters('dnsNameForFrontPublicIP'),'.',resourceGroup().location)]",
+    "paramsAdmin":"[concat(parameters('prestashop_password'),'\" \"',parameters('prestashop_firstname'),'\" \"',parameters('prestashop_lastname'),'\" \"',parameters('prestashop_email'))]",
 
     "apiVersion":{
       "resources":{
@@ -252,11 +288,14 @@
                   "settings":{
                     "fileUris":[
                       "[concat(variables('scriptsBaseUrl'),'/deploy-scaleset.sh')]",
-                      "[concat(variables('scriptsBaseUrl'),'/deploy-scaleset.yml')]"
+                      "[variables('pythonAzureScriptUrl')]",
+                      "[variables('ansiblePlaybookUrl')]",
+                      "[variables('ansibleRolesReqUrl')]",
+                      "[variables('ansibleVarsUrl')]"
                     ]
                   },
                   "protectedSettings":{
-                     "commandToExecute":"[concat(variables('customScriptFrontCommand'),' \"', parameters('keyStorageAccountName'),'\" \"',listKeys(concat('Microsoft.Storage/storageAccounts/', parameters('keyStorageAccountName')), '2015-05-01-preview').key1,'\" \"',parameters('adminUsername'),'\" \"',variables('numberOfFront'),'\" \"',parameters('scSubnetRoot'),'\" \"',parameters('scVmName'),'\"')]"
+                     "commandToExecute":"[concat(variables('customScriptFrontCommand'),' \"', parameters('keyStorageAccountName'),'\" \"',listKeys(concat('Microsoft.Storage/storageAccounts/', parameters('keyStorageAccountName')), '2015-05-01-preview').key1,'\" \"',parameters('adminUsername'),'\" \"',variables('numberOfFront'),'\" \"',parameters('scSubnetRoot'),'\" \"',parameters('scVmName'),'\" \"',variables('paramsExtra'),'\" \"',variables('paramsAdmin'),'\" \"',parameters('hcSubnetRoot'),'\"')]"
                   }
                 }
               },

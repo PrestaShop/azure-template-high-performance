@@ -1,0 +1,4 @@
+- src: geerlingguy.nfs
+- src: geerlingguy.php
+- src: geerlingguy.apache
+- src: geerlingguy.apache-php-fpm

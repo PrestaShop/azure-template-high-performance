@@ -128,6 +128,38 @@ function install_packages()
     done
 }
 
+function install_ansible()
+{
+    
+    log "Install ppa:ansible/ansible ..."
+    until apt-add-repository ppa:ansible/ansible
+    do
+      log "Lock detected on apt-get while install Try again..."
+      sleep 2
+    done
+    
+    log "Update System ..."
+    until apt-get --yes update
+    do
+      log "Lock detected on apt-get while install Try again..."
+      sleep 2
+    done
+    
+    log "Install Ansible ..."
+    until apt-get --yes install ansible
+    do
+      log "Lock detected on apt-get while install Try again..."
+      sleep 2
+    done
+    
+    log "Install sshpass"
+    until apt-get --yes install sshpass
+    do
+      log "Lock detected on apt-get while install Try again..."
+      sleep 2
+    done
+}
+
 
 function get_sshkeys()
  {
@@ -158,6 +190,8 @@ function fix_etc_hosts()
   IP=$(ip addr show eth0 | grep inet | grep -v inet6 | awk '{ print $2; }' | sed 's?/.*$??')
   HOST=$(hostname)
   echo "${IP}" "${HOST}" >> "${HOST_FILE}"
+
+  echo "${hcSubnetRoot}.4    ${NFSVmName}" >> "${HOST_FILE}"
 }
 
 
@@ -176,11 +210,72 @@ function add_host_entry()
 }
 
 
+function configure_ansible()
+{
+  log "Generate ansible files..."
+  rm -rf /etc/ansible
+  error_log "Unable to remove /etc/ansible directory"
+  mkdir -p /etc/ansible
+  error_log "Unable to create /etc/ansible directory"
+  
+  # Remove Deprecation warning
+  printf "[defaults]\ndeprecation_warnings = False\nhost_key_checking = False\n\n"    >>  "${ANSIBLE_CONFIG_FILE}"
+  
+  # Shorten the ControlPath to avoid errors with long host names , long user names or deeply nested home directories
+  echo  $'[ssh_connection]\ncontrol_path = ~/.ssh/ansible-%%h-%%r'                    >> "${ANSIBLE_CONFIG_FILE}"   
+  # fix ansible bug
+  printf "\npipelining = True\n"                                                      >> "${ANSIBLE_CONFIG_FILE}"   
+
+  let nWeb=${numberOfFront}-1
+  echo "[front]"                                                                                                                           >> "${ANSIBLE_HOST_FILE}"
+  echo "${frVmName}[0:$nWeb] ansible_user=${ANSIBLE_USER} ansible_ssh_private_key_file=/home/${ANSIBLE_USER}/.ssh/id_rsa"                  >> "${ANSIBLE_HOST_FILE}"
+
+}
+
+function get_roles()
+{
+  ansible-galaxy install -f -r install_roles_scaleset.yml
+  error_log "Can't get roles from Galaxy'"
+}
+
+
+function configure_deployment()
+{
+  mkdir -p vars
+  error_log "Fail to create vars directory"
+  mkdir -p group_vars
+  error_log "Fail to create group_vars  directory"
+  mv main.yml vars/main.yml
+  error_log "Fail to move vars file to directory vars"
+}
+
+function create_extra_vars()
+{
+  d="$(date -u +%Y%m%d%H%M%SZ)" 
+  HOST=$(hostname)
+  printf "{\n  \"ansistrano_release_version\": \"%s\",\n" "${d}"            > "${EXTRA_VARS}"
+  printf "  \"nfsserver\": \"%s\",\n" "${NFSVmName}"                       >> "${EXTRA_VARS}"
+  printf "  \"current_hostname\": \"%s\",\n" "${HOST}"                     >> "${EXTRA_VARS}"
+  printf "  \"prestashop_lb_name\": \"%s\",\n" "${lbName}"                 >> "${EXTRA_VARS}"
+  printf "  \"prestashop_firstname\": \"%s\",\n" "${prestashop_firstname}" >> "${EXTRA_VARS}"
+  printf "  \"prestashop_lastname\": \"%s\",\n" "${prestashop_lastname}"   >> "${EXTRA_VARS}"
+  printf "  \"prestashop_email\": \"%s\",\n" "${prestashop_email}"         >> "${EXTRA_VARS}"
+  printf "  \"prestashop_password\": \"%s\"\n}" "${prestashop_password}"   >> "${EXTRA_VARS}"
+}
+
 function start_nc()
 {
   log "Pause script for Control VM..."
   nohup nc -d -l 3333 >/tmp/nohup.log 2>&1
 }
+
+
+function deploy_scaleset()
+{
+  ansible-playbook deploy-scaleset.yml --connection=local -i "localhost," --extra-vars "@${EXTRA_VARS}" > /tmp/ansible.log 2>&1
+  error_log "Fail to deploy scale set node !"
+}
+
 
 log "Execution of Install Script from CustomScript ..."
 
@@ -198,18 +293,33 @@ ANSIBLE_USER="${3}"
 numberOfFront="${4}"
 frSubnetRoot="${5}"
 frVmName="${6}"
-
+lbName="${7}"
+prestashop_password="${8:-prestashop}"
+prestashop_firstname="${9}"
+prestashop_lastname="${10}"
+prestashop_email="${11}"
+hcSubnetRoot="${12}"
 
 HOST_FILE="/etc/hosts"
+ANSIBLE_HOST_FILE="/etc/ansible/hosts"
+ANSIBLE_CONFIG_FILE="/etc/ansible/ansible.cfg"
+EXTRA_VARS="${CWD}/extra_vars.json"
+NFSVmName="nfs-server"
 
 ##
 
 fix_etc_hosts
 install_packages
+install_ansible
 get_sshkeys
 ssh_config
 ssh_config_root
 add_host_entry
+configure_ansible
+get_roles
+configure_deployment
+create_extra_vars
+deploy_scaleset
 
 # Script Wait for the wait_module from ansible playbook
 #start_nc

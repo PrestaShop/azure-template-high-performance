@@ -557,6 +557,18 @@
           "dnsNameForFrontPublicIP":{
             "value":"[parameters('dnsNameForFrontPublicIP')]"
           },
+          "prestashop_firstname":{
+            "value":"[parameters('prestashop_firstname')]"
+          },
+          "prestashop_lastname":{
+            "value":"[parameters('prestashop_lastname')]"
+          },
+          "prestashop_email":{
+            "value":"[parameters('prestashop_email')]"
+          },
+          "prestashop_password":{
+            "value":"[parameters('prestashop_password')]"
+          },
           "instanceCount":{
             "value":"[parameters('instanceCount')]"
           },

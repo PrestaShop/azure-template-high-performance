@@ -1,6 +1,4 @@
 #!/bin/bash
-
-#!/bin/bash
 function usage()
  {
     echo "INFO:"
@@ -98,6 +96,13 @@ function install_ansible()
    
     log "Install git ..."
     until apt-get --yes install git
+    do
+      log "Lock detected on apt-get while install Try again..."
+      sleep 2
+    done
+
+    log "Install unzip ..."
+    until apt-get --yes install unzip
     do
       log "Lock detected on apt-get while install Try again..."
       sleep 2
@@ -247,6 +252,13 @@ function deploy_cluster()
   error_log "Fail to deploy front cluster !"
 }
 
+
+function deploy_code()
+{
+  ansible-playbook deploy.yml --connection=local -i "localhost," --extra-vars "@${EXTRA_VARS}" > /tmp/ansible.log 2>&1
+  error_log "Fail to deploy NFS and prestashop code !"
+}
+
 log "Execution of Install Script from CustomScript ..."
 
 ## Variables
@@ -299,6 +311,7 @@ configure_ansible
 get_roles
 configure_deployment
 create_extra_vars
+deploy_code
 #deploy_cluster
 
 log "Success : End of Execution of Install Script from CustomScript"
