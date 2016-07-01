@@ -191,6 +191,7 @@
     "hcOSDiskName":"hcosdisk",
     "scriptsBaseUrl":"https://raw.githubusercontent.com/PrestaShop/azure-template-high-performance/master/scripts/",
     "numberOfFront":"100",
+    "ansibleHCPlaybookLocation":"deploy.yml",
     "ansiblePlaybookLocation":"deploy-prestashop.yml",
     "ansibleRolesReqLocation":"install_roles.yml",
     "ansibleVarsLocation":"vars/main.yml",
@@ -201,6 +202,7 @@
     "customScriptDeployUrl":"[concat(variables('scriptsBaseUrl'),variables('customScriptDeployFile'))]",
     "customScriptAnsibleCommand":"[concat('bash ',variables('customScriptDeployFile'))]",
     "ansiblePlaybookUrl":"[concat(variables('scriptsBaseUrl'),variables('ansiblePlaybookLocation'))]",
+    "ansibleHCPlaybookUrl":"[concat(variables('scriptsBaseUrl'),variables('ansibleHCPlaybookLocation'))]",
     "ansibleRolesReqUrl":"[concat(variables('scriptsBaseUrl'),variables('ansibleRolesReqLocation'))]",
     "ansibleVarsUrl":"[concat(variables('scriptsBaseUrl'),variables('ansibleVarsLocation'))]",
     "ansibleVarsMastersUrl":"[concat(variables('scriptsBaseUrl'),variables('ansibleVarsMasterLocation'))]",
@@ -307,6 +309,7 @@
           "fileUris":[
             "[variables('customScriptDeployUrl')]",
             "[variables('ansiblePlaybookUrl')]",
+            "[variables('ansibleHCPlaybookUrl')]",
             "[variables('ansibleRolesReqUrl')]",
             "[variables('ansibleVarsUrl')]",
             "[variables('pythonAzureScriptUrl')]",
