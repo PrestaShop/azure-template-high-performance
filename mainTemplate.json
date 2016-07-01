@@ -510,7 +510,8 @@
       "apiVersion":"[variables('apiVersion').deployment]",
       "dependsOn":[
         "[concat('Microsoft.Resources/deployments/', 'SharedDeployment')]",
-        "[concat('Microsoft.Resources/deployments/', 'JumpBoxDeployment')]"
+        "[concat('Microsoft.Resources/deployments/', 'JumpBoxDeployment')]",
+        "[concat('Microsoft.Resources/deployments/', 'BackDeployment')]"
       ],
       "properties":{
         "mode":"Incremental",
