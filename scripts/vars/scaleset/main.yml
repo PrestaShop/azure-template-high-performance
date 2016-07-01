@@ -1,5 +1,5 @@
 
-
+---
 nfs_mountpoint: "/data"
 nfspath: "/data"
 system_devices: "/dev/sda|/dev/sdb"

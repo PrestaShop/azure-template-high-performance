@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/bin/bash -
 function usage()
  {
     echo "INFO:"
-    echo "Usage: deploy-front.sh [storage-account-name] [storage-account-key] [ansible user]"
+    echo "Usage: deploy-scaleset.sh [storage-account-name] [storage-account-key] [ansible user]"
 }
 
 error_log()
@@ -18,7 +18,7 @@ function log()
 {
 	
   mess="$(hostname): $1"
-
+  echo "[LOG] ${BASH_SCRIPT} : ${mess}"
   logger -t "${BASH_SCRIPT}" "${mess}"
 
 }

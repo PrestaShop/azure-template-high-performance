@@ -2,10 +2,12 @@
 - hosts: all
   become: True
   gather_facts: true
+  vars_files:
+    - vars/main.yml
 
   tasks:
   - name: "Deploy NFS Client"
-    action: action: apt pkg=nfs-common state=present
+    action: apt pkg=nfs-common state=present
 
   - name: Ensure rpcbind is running (Ubuntu Trusty Tahr or newer)
     action: service name=rpcbind state=started enabled=yes
@@ -18,6 +20,6 @@
   - shell: if [ -z "$nfsoptions" ]; then  echo rw,sync,nfsvers=3; else echo $nfsoptions; fi
     register: _nfsopts
     
-  - name: configure /etc/fstab on clients
+  - name: configure /etc/fstab on clients for {{nfs_mountpoint}} on {{nfsserver}}:{{nfspath}}
     action: mount name={{nfs_mountpoint}} src={{nfsserver}}:{{nfspath}} fstype=nfs opts={{_nfsopts.stdout}} state=mounted
   
