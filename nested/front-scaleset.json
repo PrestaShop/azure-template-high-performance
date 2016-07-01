@@ -116,7 +116,10 @@
       }
     },
     "hcSubnetRoot":{
-      "type":"string"
+      "type":"string",
+      "metadata":{
+        "description":"Jumpbox root network"
+      }
     },
     "templatesBaseURL":{
       "type":"string",

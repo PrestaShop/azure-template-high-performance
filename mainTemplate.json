@@ -504,7 +504,7 @@
       }
     },
     {
-      "comments":"OK: Scale set front deployment resource",
+      "comments":"OK: Scale set FRONT deployment resource",
       "name":"FrontDeployment",
       "type":"Microsoft.Resources/deployments",
       "apiVersion":"[variables('apiVersion').deployment]",
@@ -526,6 +526,9 @@
           },
           "ubuntuOSVersion":{
             "value":"[variables('ubuntuOSVersion')]"
+          },
+          "hcSubnetRoot":{
+            "value":"[variables('hcSubnetRoot')]"
           },
           "scVmSize":{
             "value":"[parameters('scVmSize')]"
@@ -591,7 +594,7 @@
       }
     },
     {
-      "comments":"OK: Scale set front deployment resource",
+      "comments":"OK: BACK deployment resource",
       "name":"BackDeployment",
       "type":"Microsoft.Resources/deployments",
       "apiVersion":"[variables('apiVersion').deployment]",
