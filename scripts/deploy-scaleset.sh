@@ -270,7 +270,6 @@ function start_nc()
   nohup nc -d -l 3333 >/tmp/nohup.log 2>&1
 }
 
-
 function deploy_scaleset()
 {
   
