@@ -509,7 +509,8 @@
       "type":"Microsoft.Resources/deployments",
       "apiVersion":"[variables('apiVersion').deployment]",
       "dependsOn":[
-        "[concat('Microsoft.Resources/deployments/', 'SharedDeployment')]"
+        "[concat('Microsoft.Resources/deployments/', 'SharedDeployment')]",
+        "[concat('Microsoft.Resources/deployments/', 'JumpBoxDeployment')]"
       ],
       "properties":{
         "mode":"Incremental",
