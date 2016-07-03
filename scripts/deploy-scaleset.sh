@@ -207,6 +207,11 @@ function add_host_entry()
     echo "${frSubnetRoot}.${j}    ${frVmName}${i}" >> "${HOST_FILE}"
     let k=$i+1
   done
+  
+  if [ -f "${nfs_mountpoint}/etc/hosts" ]; then
+     tag="BACK"
+     sed -n "/#$tag#/,/#\/$tag#/p" "${nfs_mountpoint}/etc/hosts" >> "${HOST_FILE}"
+  fi
 }
 
 

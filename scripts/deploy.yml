@@ -23,8 +23,17 @@
       ignore_errors: True
 
     - name: "Copy host file to nfs share"
-      copy: src="/etc/ansible/hosts" dest="{{ raid_mountpoint }}/etc/ansible"
+      copy: src="/etc/ansible/hosts" dest="{{ raid_mountpoint }}/etc/ansible/"
       when: file.stat.exists
+
+    - name: "Check if etc hosts exists" 
+      action: stat path="/etc/hosts"
+      register: hosts
+      ignore_errors: True
+
+    - name: "Copy hosts file to nfs share"
+      copy: src="/etc/hosts" dest="{{ raid_mountpoint }}/etc/"
+      when: hosts.stat.exists
 
 - hosts: all
   become: True

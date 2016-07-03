@@ -198,18 +198,21 @@ function add_hosts()
   # All Nodes
   echo "### Check${hcSubnetRoot}.4    ${hcVmName}" >> "${HOST_FILE}"
   
+  echo "#FRONT#"                                   >> "${HOST_FILE}"
   for i in $(seq 0 $nWeb)
   do
     let j=4+$i
     echo "${frSubnetRoot}.${j}    ${frVmName}${i}" >> "${HOST_FILE}"
   done
+  echo "#/FRONTS#"                                 >> "${HOST_FILE}"
   
+  echo "#BACK#"                                    >> "${HOST_FILE}"
   for i in $(seq 0 $nBck)
   do
     let j=4+$i
     echo "${bkSubnetRoot}.${j}    ${bkVmName}${i}" >> "${HOST_FILE}"
   done
-  
+  echo "#/BACK#"                                   >> "${HOST_FILE}"
 }
 
 function get_roles()
