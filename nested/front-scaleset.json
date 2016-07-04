@@ -336,7 +336,7 @@
         "[concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('scVmName'))]"
       ],
       "properties": {
-        "name": "autoscalewah",
+        "name": "autoscaleps",
         "targetResourceUri": "[concat('/subscriptions/',subscription().subscriptionId, '/resourceGroups/',  resourceGroup().name, '/providers/Microsoft.Compute/virtualMachineScaleSets/', parameters('scVmName'))]",
         "enabled": true,
         "profiles": [
