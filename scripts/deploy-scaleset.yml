@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: "{{ current_hostname }}"
   become: True
   gather_facts: true
   vars_files:
@@ -8,23 +8,25 @@
   tasks:
   - name: "Deploy NFS Client"
     action: apt pkg=nfs-common state=present
-
+    
   - name: Ensure rpcbind is running (Ubuntu Trusty Tahr or newer)
     action: service name=rpcbind state=started enabled=yes
     when: ansible_lsb.major_release is defined and ansible_lsb.major_release|int >= 14
 
-  
   - name: Ensure {{nfs_mountpoint}} directory exists
     action: file path={{nfs_mountpoint}} state=directory
+   
   
   - shell: if [ -z "$nfsoptions" ]; then  echo rw,sync,nfsvers=3; else echo $nfsoptions; fi
     register: _nfsopts
+   
     
   - name: configure /etc/fstab on clients for {{nfs_mountpoint}} on {{nfsserver}}:{{nfspath}}
     action: mount name={{nfs_mountpoint}} src={{nfsserver}}:{{nfspath}} fstype=nfs opts={{_nfsopts.stdout}} state=mounted
+    
   
 
-- hosts: all
+- hosts: "{{ current_hostname }}"
   become: True
   gather_facts: true
   vars:
@@ -33,9 +35,9 @@
     - vars/main.yml
 
   roles:
-    - { role: geerlingguy.apache }
+    - { role: geerlingguy.apache } 
     - { role: geerlingguy.php }
-    - { role: geerlingguy.apache-php-fpm  }
+    - { role: geerlingguy.apache-php-fpm }
 
   tasks:
     - name: "Install prestashop default shop"

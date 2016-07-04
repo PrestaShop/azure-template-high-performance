@@ -329,7 +329,7 @@
       "comments":"OK: Autoscaling Definition",
       "type": "Microsoft.Insights/autoscaleSettings",
       "apiVersion":"[variables('apiVersion').compute]",
-      "name": "autoscalewah",
+      "name": "autoscaleps",
       "location":"[variables('location')]",
       "dependsOn": [
         "[concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('scVmName'))]"

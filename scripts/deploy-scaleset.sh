@@ -286,6 +286,8 @@ function deploy_scaleset()
      INVENTORY_FILE="${ANSIBLE_HOST_FILE}"
   fi 
 
+  log "Deploying ScaleSet..."
+
   ansible-playbook deploy-scaleset.yml --connection=local -i "${INVENTORY_FILE}" --extra-vars "@${EXTRA_VARS}" > /tmp/ansible.log 2>&1
   error_log "Fail to deploy scale set node !"
 }
