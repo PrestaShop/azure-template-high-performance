@@ -166,11 +166,25 @@ function configure_ansible()
   # Generate Hostfile for Front and Back
   # All Nodes
   
+  nWebPad=$(printf "%06d" "${nWeb}")  
+
   echo "[cluster]"                                                                                                                         >>  "${ANSIBLE_HOST_FILE}"
-  echo "${frVmName}[0:$nWeb] ansible_user=${ANSIBLE_USER} ansible_ssh_private_key_file=/home/${ANSIBLE_USER}/.ssh/id_rsa"                  >> "${ANSIBLE_HOST_FILE}"
+  for i in $(seq 0 $nWeb)
+  do
+    suffix=$(printf "%06d" "${i}")
+    echo "${frVmName}${suffix} ansible_user=${ANSIBLE_USER} ansible_ssh_private_key_file=/home/${ANSIBLE_USER}/.ssh/id_rsa"                >> "${ANSIBLE_HOST_FILE}"
+  done
+
   echo "${bkVmName}[0:$nBck] ansible_user=${ANSIBLE_USER} ansible_ssh_private_key_file=/home/${ANSIBLE_USER}/.ssh/id_rsa"                  >> "${ANSIBLE_HOST_FILE}"
   echo "[front]"                                                                                                                           >> "${ANSIBLE_HOST_FILE}"
-  echo "${frVmName}[0:$nWeb] ansible_user=${ANSIBLE_USER} ansible_ssh_private_key_file=/home/${ANSIBLE_USER}/.ssh/id_rsa"                  >> "${ANSIBLE_HOST_FILE}"
+
+  for i in $(seq 0 $nWeb)
+  do
+    suffix=$(printf "%06d" "${i}")
+    echo "${frVmName}${suffix} ansible_user=${ANSIBLE_USER} ansible_ssh_private_key_file=/home/${ANSIBLE_USER}/.ssh/id_rsa"                >> "${ANSIBLE_HOST_FILE}"
+  done
+  
+
   echo "[back]"                                                                                                                            >> "${ANSIBLE_HOST_FILE}"
   echo "${bkVmName}0 ansible_user=${ANSIBLE_USER} ansible_ssh_private_key_file=/home/${ANSIBLE_USER}/.ssh/id_rsa"        >> "${ANSIBLE_HOST_FILE}"
   if [ "${numberOfBack}" -gt 2 ]; then
@@ -202,7 +216,8 @@ function add_hosts()
   for i in $(seq 0 $nWeb)
   do
     let j=4+$i
-    echo "${frSubnetRoot}.${j}    ${frVmName}${i}" >> "${HOST_FILE}"
+    suffix=$(printf "%06d" "${i}")
+    echo "${frSubnetRoot}.${j}    ${frVmName}${suffix}" >> "${HOST_FILE}"
   done
   echo "#/FRONT#"                                 >> "${HOST_FILE}"
   
@@ -284,7 +299,7 @@ numberOfBack="${8}"
 
 hcVmName="${9}"
 # to match scaleset autonaming
-frVmName="${10}-"
+frVmName="${10}"
 bkVmName="${11}"
 prestashop_password="${12:-prestashop}"
 lbName="${13}"

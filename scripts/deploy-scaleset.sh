@@ -204,7 +204,8 @@ function add_host_entry()
   for i in $(seq 0 $nFront)
   do
     let j=4+$i
-    echo "${frSubnetRoot}.${j}    ${frVmName}${i}" >> "${HOST_FILE}"
+    suffix=$(printf "%06d" "${i}")
+    echo "${frSubnetRoot}.${j}    ${frVmName}${suffix}" >> "${HOST_FILE}"
     let k=$i+1
   done
   
@@ -232,9 +233,13 @@ function configure_ansible()
   printf "\npipelining = True\n"                                                      >> "${ANSIBLE_CONFIG_FILE}"   
 
   let nWeb=${numberOfFront}-1
-  echo "[front]"                                                                                                                           >> "${ANSIBLE_HOST_FILE}"
-  echo "${frVmName}[0:$nWeb] ansible_user=${ANSIBLE_USER} ansible_ssh_private_key_file=/home/${ANSIBLE_USER}/.ssh/id_rsa"                  >> "${ANSIBLE_HOST_FILE}"
-
+  echo "[front]"                                                                                                                     >> "${ANSIBLE_HOST_FILE}"
+  for i in $(seq 0 $nWeb)
+  do
+    suffix=$(printf "%06d" "${i}")
+    echo "${frVmName}${suffix} ansible_user=${ANSIBLE_USER} ansible_ssh_private_key_file=/home/${ANSIBLE_USER}/.ssh/id_rsa"          >> "${ANSIBLE_HOST_FILE}"
+  done
+  
 }
 
 function get_roles()
@@ -318,7 +323,7 @@ ANSIBLE_USER="${3}"
 numberOfFront="${4}"
 frSubnetRoot="${5}"
 # to match autonameing scaleset
-frVmName="${6}-"
+frVmName="${6}"
 lbName="${7}"
 prestashop_password="${8:-prestashop}"
 prestashop_firstname="${9}"
