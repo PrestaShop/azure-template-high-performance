@@ -343,13 +343,17 @@
         "profiles": [
           {
             "name": "Profile1",
-            "capacity": 2,
+            "capacity": {
+              "minimum": "2",
+              "maximum": "10",
+              "default": "2"
+            },
             "rules": [
               {
                 "metricTrigger": {
                   "metricName":"\\Processor\\PercentProcessorTime",
-                  "metricNamespace":"",
-                  "metricResourceUri":"[concat('/subscriptions/',subscription().subscriptionId, '/resourceGroups/',  resourceGroup().name, '/providers/Microsoft.Compute/virtualMachineScaleSets/', parameters('scVmName'))]",
+                  "metricNamespace": "",
+                  "metricResourceUri": "[concat('/subscriptions/',subscription().subscriptionId, '/resourceGroups/',  resourceGroup().name, '/providers/Microsoft.Compute/virtualMachineScaleSets/', parameters('scVmName'))]",
                   "timeGrain":"PT1M",
                   "statistic":"Average",
                   "timeWindow":"PT5M",
