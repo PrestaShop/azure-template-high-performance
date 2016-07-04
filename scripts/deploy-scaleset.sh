@@ -269,6 +269,16 @@ function create_extra_vars()
   printf "  \"prestashop_password\": \"%s\"\n}" "${prestashop_password}"   >> "${EXTRA_VARS}"
 }
 
+function wait_for_extension()
+{
+    log "Install htop ..."
+    until apt-get --yes install htop
+    do
+      log "Lock detected on apt-get while install Try again..."
+      sleep 2
+    done
+}
+
 function start_nc()
 {
   log "Pause script for Control VM..."
@@ -335,6 +345,7 @@ configure_ansible
 get_roles
 configure_deployment
 create_extra_vars
+wait_for_extension
 deploy_scaleset
 
 # Script Wait for the wait_module from ansible playbook
