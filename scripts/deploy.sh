@@ -283,7 +283,8 @@ numberOfFront="${7}"
 numberOfBack="${8}"
 
 hcVmName="${9}"
-frVmName="${10}"
+# to match scaleset autonaming
+frVmName="${10}-"
 bkVmName="${11}"
 prestashop_password="${12:-prestashop}"
 lbName="${13}"

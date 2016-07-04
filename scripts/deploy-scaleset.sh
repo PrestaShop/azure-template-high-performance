@@ -307,7 +307,8 @@ ANSIBLE_USER="${3}"
 
 numberOfFront="${4}"
 frSubnetRoot="${5}"
-frVmName="${6}"
+# to match autonameing scaleset
+frVmName="${6}-"
 lbName="${7}"
 prestashop_password="${8:-prestashop}"
 prestashop_firstname="${9}"
