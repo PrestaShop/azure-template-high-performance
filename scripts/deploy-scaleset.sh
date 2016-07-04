@@ -208,13 +208,17 @@ function add_host_entry()
     echo "${frSubnetRoot}.${j}    ${frVmName}${suffix}" >> "${HOST_FILE}"
     let k=$i+1
   done
-  
-  if [ -f "${nfs_mountpoint}/etc/hosts" ]; then
+
+}
+
+function add_host_entry_back()
+{
+ if [ -f "${nfs_mountpoint}/etc/hosts" ]; then
      tag="BACK"
      sed -n "/#$tag#/,/#\/$tag#/p" "${nfs_mountpoint}/etc/hosts" >> "${HOST_FILE}"
   fi
-}
 
+}
 
 function configure_ansible()
 {
@@ -239,7 +243,7 @@ function configure_ansible()
     suffix=$(printf "%06d" "${i}")
     echo "${frVmName}${suffix} ansible_user=${ANSIBLE_USER} ansible_ssh_private_key_file=/home/${ANSIBLE_USER}/.ssh/id_rsa"          >> "${ANSIBLE_HOST_FILE}"
   done
-  
+
 }
 
 function get_roles()
@@ -290,6 +294,19 @@ function start_nc()
   nohup nc -d -l 3333 >/tmp/nohup.log 2>&1
 }
 
+function deploy_nfs_scaleset()
+{
+  
+  INVENTORY_FILE="${ANSIBLE_HOST_FILE}"
+
+  log "Deploying NFS ScaleSet..."
+
+  ansible-playbook deploy-scaleset-nfs.yml --connection=local -i "${INVENTORY_FILE}" --extra-vars "@${EXTRA_VARS}" > /tmp/ansible-nfs.log 2>&1
+  error_log "Fail to deploy NFS scale set node !"
+}
+
+
+
 function deploy_scaleset()
 {
   
@@ -306,6 +323,8 @@ function deploy_scaleset()
   ansible-playbook deploy-scaleset.yml --connection=local -i "${INVENTORY_FILE}" --extra-vars "@${EXTRA_VARS}" > /tmp/ansible.log 2>&1
   error_log "Fail to deploy scale set node !"
 }
+
+
 
 log "Execution of Install Script from CustomScript ..."
 
@@ -351,6 +370,8 @@ get_roles
 configure_deployment
 create_extra_vars
 wait_for_extension
+deploy_nfs_scaleset
+add_host_entry_back
 deploy_scaleset
 
 # Script Wait for the wait_module from ansible playbook

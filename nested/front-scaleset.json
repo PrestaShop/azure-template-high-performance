@@ -187,9 +187,11 @@
     "customScriptDeployUrl":"[concat(variables('scriptsBaseUrl'),variables('customScriptDeployFile'))]",
     "customScriptFrontCommand":"[concat('bash ',variables('customScriptDeployFile'))]",
     "ansiblePlaybookLocation":"deploy-scaleset.yml",
+    "ansibleNFSPlaybookLocation":"deploy-scaleset-nfs.yml",
     "ansibleRolesReqLocation":"install_roles_scaleset.yml",
     "ansibleVarsLocation":"vars/scaleset/main.yml",
     "ansiblePlaybookUrl":"[concat(variables('scriptsBaseUrl'),variables('ansiblePlaybookLocation'))]",
+    "ansibleNFSPlaybookUrl":"[concat(variables('scriptsBaseUrl'),variables('ansibleNFSPlaybookLocation'))]",
     "ansibleRolesReqUrl":"[concat(variables('scriptsBaseUrl'),variables('ansibleRolesReqLocation'))]",
     "ansibleVarsUrl":"[concat(variables('scriptsBaseUrl'),variables('ansibleVarsLocation'))]",
     "paramsExtra":"[concat(parameters('dnsNameForFrontPublicIP'),'.',resourceGroup().location)]",
@@ -295,6 +297,7 @@
                       "[concat(variables('scriptsBaseUrl'),'/deploy-scaleset.sh')]",
                       "[variables('pythonAzureScriptUrl')]",
                       "[variables('ansiblePlaybookUrl')]",
+                      "[variables('ansibleNFSPlaybookUrl')]",
                       "[variables('ansibleRolesReqUrl')]",
                       "[variables('ansibleVarsUrl')]"
                     ]
