@@ -67,7 +67,7 @@ function install_ansible()
     done
     
     log "Install ppa:ansible/ansible ..."
-    until apt-add-repository ppa:ansible/ansible
+    until apt-add-repository --yes ppa:ansible/ansible
     do
       log "Lock detected on apt-get while install Try again..."
       sleep 2
@@ -204,7 +204,7 @@ function add_hosts()
     let j=4+$i
     echo "${frSubnetRoot}.${j}    ${frVmName}${i}" >> "${HOST_FILE}"
   done
-  echo "#/FRONTS#"                                 >> "${HOST_FILE}"
+  echo "#/FRONT#"                                 >> "${HOST_FILE}"
   
   echo "#BACK#"                                    >> "${HOST_FILE}"
   for i in $(seq 0 $nBck)

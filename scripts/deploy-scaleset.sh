@@ -132,7 +132,7 @@ function install_ansible()
 {
     
     log "Install ppa:ansible/ansible ..."
-    until apt-add-repository ppa:ansible/ansible
+    until apt-add-repository --yes ppa:ansible/ansible
     do
       log "Lock detected on apt-get while install Try again..."
       sleep 2
