@@ -148,6 +148,7 @@
     }
   },
   "variables":{
+    "prestashop_sku":"ubuntu_base_16_04_no_price",
     "numberOfFront":"100",
     "scriptsBaseUrl":"https://raw.githubusercontent.com/PrestaShop/azure-template-high-performance/master/scripts/",
     "location":"[resourceGroup().location]",
@@ -158,9 +159,9 @@
     "osDiskName":"[concat(parameters('scVmName'), 'osdisk')]",
     "storageAccountEndPoint":"https://core.windows.net",
     "osType":{
-      "publisher":"Canonical",
-      "offer":"UbuntuServer",
-      "sku":"[parameters('ubuntuOSVersion')]",
+      "publisher":"prestashop",
+      "offer":"ubuntu-base-for-prestashop",
+      "sku":"variables('prestashop_sku')",
       "version":"latest"
     },
     "imageReference":"[variables('osType')]",
