@@ -331,8 +331,7 @@
         }
       }
     },
-    {
-      "comments":"OK: Autoscaling Definition",
+    { "comments":"OK: Autoscaling Definition",
       "type": "Microsoft.Insights/autoscaleSettings",
       "apiVersion":"[variables('apiVersion').scale]",
       "name": "autoscaleps",
