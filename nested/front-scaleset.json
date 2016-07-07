@@ -161,7 +161,7 @@
     "osType":{
       "publisher":"Canonical",
       "offer":"UbuntuServer",
-      "sku":"[parameters('ubuntuOSVersion')]",
+      "sku":"[variables('prestashop_sku')]",
       "version":"latest"
     },
     "imageReference":"[variables('osType')]",
