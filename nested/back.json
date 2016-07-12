@@ -93,7 +93,7 @@
       "type":"string",
       "metadata":{
         "description":"Storage Account Name for diags"
-      }      
+      }
     }
   },
   "variables":{
@@ -101,8 +101,9 @@
     "sshKeyPath":"[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
     "dnsserver":"8.8.8.8",
     "location":"[resourceGroup().location]",
-    "imagePublisher":"Canonical",
-    "imageOffer":"UbuntuServer",
+    "imagePublisher":"prestashop",
+    "imageOffer":"ubuntu-base-for-prestashop",
+    "sku":"ubuntu_base_16_04",
     "bkOSDiskName":"bkosdisk",
     "bkDataDiskName":"bkdatadisk",
     "keyStorageAccountType":"Standard_LRS",
@@ -248,7 +249,7 @@
           "imageReference":{
             "publisher":"[variables('imagePublisher')]",
             "offer":"[variables('imageOffer')]",
-            "sku":"[parameters('ubuntuOSVersion')]",
+            "sku":"[variables('sku')]",
             "version":"latest"
           },
           "osDisk":{
@@ -259,7 +260,6 @@
             "caching":"ReadWrite",
             "createOption":"FromImage"
           },
-          
           "dataDisks": [
             {
               "name": "datadisk0",
