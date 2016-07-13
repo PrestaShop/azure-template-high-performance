@@ -403,9 +403,9 @@
             },
             "osPlatform":"Linux",
             "imageReference":{
-              "publisher":"Canonical",
-              "offer":"UbuntuServer",
-              "sku":"16.04.0-LTS"
+              "publisher":"prestashop",
+              "offer":"ubuntu-base-for-prestashop",
+              "sku":"ubuntu_base_16_04"
             },
             "count":2,
             "visible":true

@@ -148,7 +148,7 @@
     }
   },
   "variables":{
-    "prestashop_sku":"ubuntu_base_16_04_no_price",
+    "prestashop_sku":"ubuntu_base_16_04",
     "numberOfFront":"100",
     "scriptsBaseUrl":"https://raw.githubusercontent.com/PrestaShop/azure-template-high-performance/master/scripts/",
     "location":"[resourceGroup().location]",
