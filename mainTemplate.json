@@ -286,12 +286,13 @@
       "deployment":"2016-02-01"
     },
     "scPublicIPAddressType":"Dynamic",
-    "frLBName":"[concat('lb', resourceGroup().name)]",
-    "hcVmName":"[concat('ans', resourceGroup().name)]",
-    "scVmName":"[concat('web', resourceGroup().name)]",
-    "bkVmName":"[concat('bdd', resourceGroup().name)]",
+    "cleanRGP":"[replace(resourceGroup().name,'_','')]",
+    "frLBName":"[concat('lb', variables('cleanRGP'))]",
+    "hcVmName":"[concat('ans', variables('cleanRGP'))]",
+    "scVmName":"[concat('web', variables('cleanRGP'))]",
+    "bkVmName":"[concat('bdd', variables('cleanRGP'))]",
     "uniqScStorageAccountName":"[uniqueString(concat(resourceGroup().id, parameters('scStorageAccountName')))]",
-    "bkAvailabilitySetName":"[concat('bkav', resourceGroup().name)]",
+    "bkAvailabilitySetName":"[concat('bkav', variables('cleanRGP'))]",
     "hcSubnetRoot":"[concat( split(parameters('hcSubnetPrefix'), '.')[0], '.', split(parameters('hcSubnetPrefix'), '.')[1], '.', split(parameters('hcSubnetPrefix'), '.')[2])]",
     "scSubnetRoot":"[concat( split(parameters('scSubnetPrefix'), '.')[0], '.', split(parameters('scSubnetPrefix'), '.')[1], '.', split(parameters('scSubnetPrefix'), '.')[2])]",
     "bkSubnetRoot":"[concat( split(parameters('bkSubnetPrefix'), '.')[0], '.', split(parameters('bkSubnetPrefix'), '.')[1], '.', split(parameters('bkSubnetPrefix'), '.')[2])]"
