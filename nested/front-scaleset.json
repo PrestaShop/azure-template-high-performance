@@ -210,13 +210,18 @@
     }
   },
   "resources":[
-    
+
     { "comments":"OK: ScaleSet Definition",
       "type":"Microsoft.Compute/virtualMachineScaleSets",
       "name":"[parameters('scVmName')]",
       "location":"[variables('location')]",
       "apiVersion":"[variables('apiVersion').compute]",
       "dependsOn":[ ],
+      "plan": {
+        "publisher": "[variables('osType').publisher]",
+        "product": "[variables('osType').offer]",
+        "name": "[variables('osType').sku]"
+      },
       "sku":{
         "name":"[parameters('scVmSize')]",
         "tier":"Standard",
