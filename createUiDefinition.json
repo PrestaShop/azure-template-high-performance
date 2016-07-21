@@ -349,6 +349,7 @@
             "constraints":{
               "required":true,
               "regex":"^[a-z0-9]{3,10}$",
+              "validationMessage":"Storage accountname Name must contain at least 3 characters up to 10 and can contain only numbers and lowercase letters.",
               "excludedTypes":[
                 "Standard_LRS",
                 "Standard_GRS",
@@ -425,6 +426,7 @@
             "constraints":{
               "required":true,
               "regex":"^[a-z0-9]{3,10}$",
+              "validationMessage":"Storage accountname Name must contain at least 3 characters up to 10 and can contain only numbers and lowercase letters.",
               "excludedTypes":[
                 "Standard_LRS",
                 "Standard_GRS",
@@ -565,6 +567,7 @@
             "constraints":{
               "required":true,
               "regex":"^[a-z0-9]{3,10}$",
+              "validationMessage":"Storage accountname Name must contain at least 3 characters up to 10 and can contain only numbers and lowercase letters.",
               "excludedTypes":[
                 "Standard_LRS",
                 "Standard_GRS",
