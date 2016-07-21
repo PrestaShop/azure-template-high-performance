@@ -6,7 +6,7 @@
       {
         "name":"shopSize",
         "type":"Microsoft.Common.DropDown",
-        "label":"Databse Shop Size",
+        "label":"Database Shop Size",
         "defaultValue":"Small",
         "toolTip":"The size of Disk virtual machines to use in the cluster.",
         "constraints":{
