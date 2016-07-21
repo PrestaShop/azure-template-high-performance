@@ -348,7 +348,6 @@
             },
             "constraints":{
               "required":true,
-              "regex":"^[a-zA-Z0-9]{3,10}$",
               "excludedTypes":[
                 "Standard_LRS",
                 "Standard_GRS",
@@ -424,7 +423,6 @@
             },
             "constraints":{
               "required":true,
-              "regex":"^[a-zA-Z0-9]{3,10}$",
               "excludedTypes":[
                 "Standard_LRS",
                 "Standard_GRS",
@@ -564,7 +562,6 @@
             },
             "constraints":{
               "required":true,
-              "regex":"^[a-zA-Z0-9]{3,10}$",
               "excludedTypes":[
                 "Standard_LRS",
                 "Standard_GRS",
