@@ -286,7 +286,7 @@
       "deployment":"2016-02-01"
     },
     "scPublicIPAddressType":"Dynamic",
-    "cleanRGP":"[replace(resourceGroup().name,'_','')]",
+    "cleanRGP":"[uniqueString(resourceGroup().id, deployment().name)]",
     "frLBName":"[concat('lb', variables('cleanRGP'))]",
     "hcVmName":"[concat('ans', variables('cleanRGP'))]",
     "scVmName":"[concat('web', variables('cleanRGP'))]",
