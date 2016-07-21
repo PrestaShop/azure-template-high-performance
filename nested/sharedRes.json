@@ -6,7 +6,7 @@
       "type":"string",
       "metadata":{
         "description":"Storage Account Name for diags"
-      }      
+      }
     },
     "diagnosticsStorageAccountType":{
       "type":"string",
@@ -18,7 +18,7 @@
       "type":"string",
       "metadata":{
         "description":"Storage Account Name for secrets"
-      }      
+      }
     },
     "hcStorageAccountName":{
       "type":"string",
@@ -335,7 +335,7 @@
     { "comments":"OK: Global Storage Account for the front scaleset VM",
       "type":"Microsoft.Storage/storageAccounts",
       "location":"[variables('location')]",
-      "name":"[concat(variables('uniqueStringArray')[copyIndex()], toLower(parameters('scStorageAccountName'))   )]",
+      "name":"[concat(variables('uniqueStringArray')[copyIndex()], 'sc'   )]",
       "apiVersion":"[variables('apiVersion').storage]",
       "copy":{
         "name":"storageLoop",

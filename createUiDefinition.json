@@ -76,7 +76,7 @@
             "name":"hcPublicIP",
             "type":"Microsoft.Network.PublicIpAddressCombo",
             "label":{
-              "publicIpAddress":"Public IP address for Jumbox VM",
+              "publicIpAddress":"Public IP address for Jumpbox VM",
               "domainNameLabel":"Domain Name Suffix for Jumpbox VM"
             },
             "defaultValue":{
@@ -132,7 +132,7 @@
             },
             "subnets":{
               "subnet1":{
-                "label":"Jumbox subnet",
+                "label":"Jumpbox subnet",
                 "defaultValue":{
                   "name":"hc-subnet",
                   "addressPrefixSize":"/24",
@@ -348,8 +348,6 @@
             },
             "constraints":{
               "required":true,
-              "regex":"^[a-z0-9]{3,10}$",
-              "validationMessage":"Storage accountname Name must contain at least 3 characters up to 10 and can contain only numbers and lowercase letters.",
               "excludedTypes":[
                 "Standard_LRS",
                 "Standard_GRS",
@@ -425,8 +423,6 @@
             },
             "constraints":{
               "required":true,
-              "regex":"^[a-z0-9]{3,10}$",
-              "validationMessage":"Storage accountname Name must contain at least 3 characters up to 10 and can contain only numbers and lowercase letters.",
               "excludedTypes":[
                 "Standard_LRS",
                 "Standard_GRS",
@@ -566,8 +562,6 @@
             },
             "constraints":{
               "required":true,
-              "regex":"^[a-z0-9]{3,10}$",
-              "validationMessage":"Storage accountname Name must contain at least 3 characters up to 10 and can contain only numbers and lowercase letters.",
               "excludedTypes":[
                 "Standard_LRS",
                 "Standard_GRS",
@@ -675,7 +669,7 @@
       "bkSubnetPrefix":"[steps('deploymentDetails').virtualNetworkName.subnets.subnet3.addressPrefix]",
       "virtualNetworkName":"[steps('deploymentDetails').virtualNetworkName.name]",
       "addressPrefix":"[steps('deploymentDetails').virtualNetworkName.addressPrefix]",
-      "hcSubnetName":"[steps('deploymentDetails').virtualNetworkName.subnets.subnet1.name]",  
+      "hcSubnetName":"[steps('deploymentDetails').virtualNetworkName.subnets.subnet1.name]",
       "scSubnetName":"[steps('deploymentDetails').virtualNetworkName.subnets.subnet2.name]",
       "bkSubnetName":"[steps('deploymentDetails').virtualNetworkName.subnets.subnet3.name]",
       "location":"[location()]"
