@@ -309,7 +309,7 @@
       "type":"Microsoft.Compute/virtualMachines/extensions",
       "name":"[concat(parameters('hcVmName'),'/installAnsible')]",
       "apiVersion":"[variables('apiVersion').compute]",
-      "location":"[resourceGroup().location]",
+      "location":"[parameters('location')]",
       "dependsOn":[
         "[concat('Microsoft.Compute/virtualMachines/', parameters('hcVmName'))]"
       ],

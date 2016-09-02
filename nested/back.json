@@ -204,7 +204,7 @@
       "type":"Microsoft.Compute/virtualMachines/extensions",
       "name":"[concat(parameters('bkVmName'),copyindex(),'/installBack')]",
       "apiVersion":"[variables('apiVersion').compute]",
-      "location":"[resourceGroup().location]",
+      "location":"[parameters('location')]",
       "copy":{
         "name":"bkExtLoop",
         "count":"[parameters('numberOfBack')]"
