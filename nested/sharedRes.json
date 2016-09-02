@@ -226,7 +226,7 @@
       "type": "Microsoft.Compute/availabilitySets",
       "name": "[parameters('bkAvailabilitySetName')]",
       "apiVersion": "[variables('apiVersion').network]",
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('location')]",
       "properties": {
         "PlatformFaultDomainCount": "[variables('bkFaultDomainCount')]",
         "PlatformUpdateDomainCount": "[variables('bkUpdateDomainCount')]"
