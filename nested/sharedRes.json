@@ -34,14 +34,14 @@
     },
     "hcPublicIPAddressName":{
       "type":"string",
-      "defaultValue": "hcPublicIP", 
+      "defaultValue": "hcPublicIP",
       "metadata":{
         "description":"Public IP address Name for Jumpbox VM"
       }
     },
     "dnsNameForAnsiblePublicIP":{
       "type":"string",
-      "defaultValue": "hcPublicIP", 
+      "defaultValue": "hcPublicIP",
       "metadata":{
         "description":"DNS Name for Jumpbox VM"
       }
@@ -139,7 +139,7 @@
     },
     "scPublicIPAddressName":{
       "type":"string",
-      "defaultValue": "scPublicIP", 
+      "defaultValue": "scPublicIP",
       "metadata":{
         "description": "Public IP address Name for web-front scaleset load balancer VM"
       }
@@ -185,6 +185,12 @@
       "metadata":{
         "description":"Uniq Name Suffix for scaleset storage accounts "
       }
+    },
+    "location":{
+      "type":"string",
+      "metadata":{
+        "description":"Deployment location"
+      }
     }
   },
   "variables": {
@@ -193,13 +199,12 @@
     "scSaCount":5,
     "keyStorageAccountType":"Standard_LRS",
     "hcPublicIPAddressType":"Dynamic",
-    "location":"[resourceGroup().location]",
     "apiVersion":{
       "resources":{
         "deployments":"2015-01-01"
       },
-      "network":"2015-05-01-preview",
-      "storage":"2015-05-01-preview",
+      "network":"2016-08-01",
+      "storage":"2016-01-01",
       "compute":"2015-06-15",
       "deployment":"2016-02-01"
     },
@@ -231,18 +236,18 @@
       "apiVersion":"[variables('apiVersion').network]",
       "type":"Microsoft.Network/networkSecurityGroups",
       "name":"[parameters('hcNetworkSecurityGroupName')]",
-      "location":"[variables('location')]",
+      "location":"[parameters('location')]",
       "tags":{
         "displayName":"HC-NetworkSecurityGroup"
       },
       "properties":{
         "securityRules":[
           {
-            "name":"openbar-in",
+            "name":"hc-in",
             "properties":{
-              "protocol":"*",
+              "protocol":"TCP",
               "sourcePortRange":"*",
-              "destinationPortRange":"*",
+              "destinationPortRange":"22",
               "sourceAddressPrefix":"*",
               "destinationAddressPrefix":"*",
               "access":"Allow",
@@ -257,7 +262,7 @@
       "apiVersion":"[variables('apiVersion').network]",
       "type":"Microsoft.Network/networkSecurityGroups",
       "name":"[parameters('scNetworkSecurityGroupName')]",
-      "location":"[variables('location')]",
+      "location":"[parameters('location')]",
       "tags":{
         "displayName":"FRONT-NetworkSecurityGroup"
       },
@@ -266,9 +271,9 @@
           {
             "name":"http80-in",
             "properties":{
-              "protocol":"*",
+              "protocol":"TCP",
               "sourcePortRange":"*",
-              "destinationPortRange":"*",
+              "destinationPortRange":"80",
               "sourceAddressPrefix":"*",
               "destinationAddressPrefix":"*",
               "access":"Allow",
@@ -283,33 +288,60 @@
       "apiVersion":"[variables('apiVersion').network]",
       "type":"Microsoft.Network/networkSecurityGroups",
       "name":"[parameters('bkNetworkSecurityGroupName')]",
-      "location":"[variables('location')]",
+      "location":"[parameters('location')]",
       "tags":{
         "displayName":"BACK-NetworkSecurityGroup"
       },
       "properties":{
         "securityRules":[
           {
-            "name":"acc-in",
+            "name":"hc-in",
             "properties":{
               "protocol":"*",
               "sourcePortRange":"*",
               "destinationPortRange":"*",
-              "sourceAddressPrefix":"*",
+              "sourceAddressPrefix":"[parameters('hcSubnetPrefix')]",
+              "destinationAddressPrefix":"*",
+              "access":"Allow",
+              "priority":102,
+              "direction":"Inbound"
+            }
+          },
+          {
+            "name":"front-in",
+            "properties":{
+              "protocol":"*",
+              "sourcePortRange":"*",
+              "destinationPortRange":"*",
+              "sourceAddressPrefix":"[parameters('scSubnetPrefix')]",
               "destinationAddressPrefix":"*",
               "access":"Allow",
               "priority":101,
+              "direction":"Inbound"
+            }
+          },
+          {
+            "name":"back-in",
+            "properties":{
+              "protocol":"*",
+              "sourcePortRange":"*",
+              "destinationPortRange":"*",
+              "sourceAddressPrefix":"[parameters('bkSubnetPrefix')]",
+              "destinationAddressPrefix":"*",
+              "access":"Allow",
+              "priority":103,
               "direction":"Inbound"
             }
           }
         ]
       }
     },
+
     { "comments":"OK: Global Storage Account for Ansible control VM (JumpBox)",
       "type":"Microsoft.Storage/storageAccounts",
       "name":"[toLower(parameters('hcStorageAccountName'))]",
       "apiVersion":"[variables('apiVersion').storage]",
-      "location":"[variables('location')]",
+      "location":"[parameters('location')]",
       "properties":{
         "accountType":"[parameters('hcStorageAccountType')]"
       }
@@ -318,7 +350,7 @@
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[parameters('diagnosticsStorageAccountName')]",
       "apiVersion":"[variables('apiVersion').storage]",
-      "location":"[variables('location')]",
+      "location":"[parameters('location')]",
       "properties": {
         "accountType": "[parameters('diagnosticsStorageAccountType')]"
       }
@@ -327,14 +359,14 @@
       "type":"Microsoft.Storage/storageAccounts",
       "name":"[toLower(parameters('keyStorageAccountName'))]",
       "apiVersion":"[variables('apiVersion').storage]",
-      "location":"[variables('location')]",
+      "location":"[parameters('location')]",
       "properties":{
         "accountType":"[variables('keyStorageAccountType')]"
       }
     },
     { "comments":"OK: Global Storage Account for the front scaleset VM",
       "type":"Microsoft.Storage/storageAccounts",
-      "location":"[variables('location')]",
+      "location":"[parameters('location')]",
       "name":"[concat(variables('uniqueStringArray')[copyIndex()], 'sc'   )]",
       "apiVersion":"[variables('apiVersion').storage]",
       "copy":{
@@ -349,7 +381,7 @@
       "apiVersion":"[variables('apiVersion').network]",
       "type":"Microsoft.Network/publicIPAddresses",
       "name":"[parameters('scPublicIPAddressName')]",
-      "location":"[variables('location')]",
+      "location":"[parameters('location')]",
       "properties":{
         "publicIPAllocationMethod":"[parameters('scPublicIPAddressType')]",
         "dnsSettings":{
@@ -361,7 +393,7 @@
       "apiVersion":"[variables('apiVersion').network]",
       "type":"Microsoft.Network/publicIPAddresses",
       "name":"[parameters('hcPublicIPAddressName')]",
-      "location":"[variables('location')]",
+      "location":"[parameters('location')]",
       "properties":{
         "publicIPAllocationMethod":"[variables('hcPublicIPAddressType')]",
         "dnsSettings":{
@@ -373,7 +405,7 @@
       "apiVersion":"[variables('apiVersion').network]",
       "type":"Microsoft.Network/virtualNetworks",
       "name":"[parameters('virtualNetworkName')]",
-      "location":"[variables('location')]",
+      "location":"[parameters('location')]",
       "dependsOn":[
         "[concat('Microsoft.Network/networkSecurityGroups/', parameters('hcNetworkSecurityGroupName'))]",
         "[concat('Microsoft.Network/networkSecurityGroups/', parameters('scNetworkSecurityGroupName'))]",
@@ -420,7 +452,7 @@
       "apiVersion":"[variables('apiVersion').compute]",
       "name":"[parameters('frLBName')]",
       "type":"Microsoft.Network/loadBalancers",
-      "location":"[variables('location')]",
+      "location":"[parameters('location')]",
       "dependsOn":[
         "[concat('Microsoft.Network/publicIPAddresses/', parameters('scPublicIPAddressName'))]"
       ],

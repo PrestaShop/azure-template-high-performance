@@ -265,7 +265,6 @@
       "scfrTemplateURL":"[concat(parameters('templatesBaseURL'),'/nested/front-scaleset.json')]",
       "backTemplateURL":"[concat(parameters('templatesBaseURL'),'/nested/back.json')]"
     },
-    "dnsserver":"8.8.8.8",
     "subnetCIDR":".0/24",
     "imagePublisher":"Canonical",
     "imageOffer":"UbuntuServer",
@@ -280,8 +279,8 @@
       "resources":{
         "deployments":"2015-01-01"
       },
-      "network":"2015-05-01-preview",
-      "storage":"2015-05-01-preview",
+      "network":"2016-08-01",
+      "storage":"2016-01-01",
       "compute":"2015-06-15",
       "deployment":"2016-02-01"
     },
@@ -312,6 +311,9 @@
           "contentVersion":"1.0.0.0"
         },
         "parameters":{
+          "location":{
+            "value":"[parameters('location')]"
+          },
           "diagnosticsStorageAccountName":{
             "value":"[variables('diagnosticsStorageAccountName')]"
           },
@@ -417,6 +419,12 @@
           "contentVersion":"1.0.0.0"
         },
         "parameters":{
+          "location":{
+            "value":"[parameters('location')]"
+          },
+          "templatesBaseURL":{
+            "value":"[parameters('templatesBaseURL')]"
+          },
           "adminUserName":{
             "value":"[parameters('adminUserName')]"
           },
@@ -521,8 +529,14 @@
           "contentVersion":"1.0.0.0"
         },
         "parameters":{
+          "location":{
+            "value":"[parameters('location')]"
+          },
           "adminUserName":{
             "value":"[parameters('adminUserName')]"
+          },
+          "adminPassword":{
+            "value":"[parameters('adminPassword')]"
           },
           "sshKeyData":{
             "value":"[parameters('sshKeyData')]"
@@ -611,8 +625,17 @@
           "contentVersion":"1.0.0.0"
         },
         "parameters":{
+          "location":{
+            "value":"[parameters('location')]"
+          },
+          "templatesBaseURL":{
+            "value":"[parameters('templatesBaseURL')]"
+          },
           "adminUserName":{
             "value":"[parameters('adminUserName')]"
+          },
+          "adminPassword":{
+            "value":"[parameters('adminPassword')]"
           },
           "sshKeyData":{
             "value":"[parameters('sshKeyData')]"
@@ -665,11 +688,11 @@
   ],
   "outputs":{
     "Ansible FQDN":{
-      "value":"[concat(parameters('dnsNameForAnsiblePublicIP'),'.',parameters('location'),'.cloudapp.azure.com')]",
+      "value":"[reference(parameters('dnsNameForAnsiblePublicIP')).dnsSettings.fqdn]",
       "type":"string"
     },
     "SHOP FQDN":{
-      "value":"[concat(parameters('dnsNameForFrontPublicIP'),'.',parameters('location'),'cloudapp.azure.com')]",
+      "value":"[reference(parameters('dnsNameForFrontPublicIP')).dnsSettings.fqdn]",
       "type":"string"
     }
   }
