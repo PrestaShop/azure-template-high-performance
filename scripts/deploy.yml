@@ -17,7 +17,7 @@
     - name: "Create ansible shareable config files"
       file: path="{{ raid_mountpoint }}/etc/ansible" state=directory mode="u=rwx,g=rx,o=rx" owner="root"
 
-    - name: "Check if hostfile exists" 
+    - name: "Check if hostfile exists"
       action: stat path="/etc/ansible/hosts"
       register: file
       ignore_errors: True
@@ -26,7 +26,7 @@
       copy: src="/etc/ansible/hosts" dest="{{ raid_mountpoint }}/etc/ansible/"
       when: file.stat.exists
 
-    - name: "Check if etc hosts exists" 
+    - name: "Check if etc hosts exists"
       action: stat path="/etc/hosts"
       register: hosts
       ignore_errors: True
@@ -43,5 +43,3 @@
 
   roles:
     - { role: carlosbuenosvinos.ansistrano-deploy }
-    
-    

@@ -29,12 +29,12 @@
         --send_email=0
       when: current_hostname == "{{ groups['front'][0] }}"
       register: php_result
-        
+
     - name: "Remove Install Directory"
       file: path="{{ prestashop_dir }}/install" state=absent
       when: php_result is defined and ( current_hostname == "{{ groups['front'][0] }}" and php_result.rc == 0 )
-      
-    - name: "Finalize files permission on {{ documentroot }}" 
-      file: dest="{{ documentroot }}" state=directory 
+
+    - name: "Finalize files permission on {{ documentroot }}"
+      file: dest="{{ documentroot }}" state=directory
             owner="{{ prestashop_owner }}" group="{{ prestashop_group }}"
-            recurse=yes 
+            recurse=yes

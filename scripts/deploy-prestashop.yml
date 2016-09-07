@@ -6,19 +6,18 @@
   - name: "Wait for port 3333 to be ready"
     local_action: wait_for port=3333 host="{{ inventory_hostname }}" state=started connect_timeout=2 timeout=600
 
-# Instalation of Mysql Cluster M/S   
+# Instalation of Mysql Cluster M/S
 - hosts: back
   become: True
   gather_facts: true
   vars_files:
     - vars/main.yml
-  
+
   pre_tasks:
     - name: "Create dynamic MySQL variables."
       set_fact:
         mysql_replication_master: "{{ groups['master'][0] }}"
 
   roles:
-    - { role: ansible-init-raid }   
-    - { role: ansible-role-mysql }  
-  
+    - { role: ansible-init-raid }
+    - { role: ansible-role-mysql }
