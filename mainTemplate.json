@@ -631,6 +631,9 @@
           },
           "uniqScStorageAccountName":{
             "value":"[variables('uniqScStorageAccountName')]"
+          },
+          "authenticationType":{
+            "value":"[parameters('authenticationType')]"
           }
         }
       }
