@@ -100,7 +100,7 @@ function ssh_config_root()
 function install_packages()
 {
     log "Install software-properties-common ..."
-    until apt-get --yes install software-properties-common
+    until apt-get --yes install software-properties-common build-essential libssl-dev libffi-dev python-dev
     do
       log "Lock detected on apt-get while install Try again..."
       sleep 2
@@ -130,7 +130,13 @@ function install_packages()
 
 function install_ansible()
 {
-    
+    log "Update System ..."
+    until apt-get --yes update
+    do
+      log "Lock detected on apt-get while install Try again..."
+      sleep 2
+    done
+
     log "Install ppa:ansible/ansible ..."
     until apt-add-repository --yes ppa:ansible/ansible
     do

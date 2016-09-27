@@ -21,7 +21,7 @@
       "metadata":{
         "description":"Admin Password for the Vms"
       },
-      "defaultValue":""
+      "defaultValue":"[uniqueString(resourceGroup().id)]"
     },
     "sshKeyData":{
       "type":"string",
