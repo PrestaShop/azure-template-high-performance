@@ -59,6 +59,13 @@ function ssh_config()
 
 function install_ansible()
 {
+    log "Update System ..."
+    until apt-get --yes update
+    do
+      log "Lock detected on apt-get while install Try again..."
+      sleep 2
+    done
+
     log "Install software-properties-common ..."
     until apt-get --yes install software-properties-common build-essential libssl-dev libffi-dev python-dev
     do
