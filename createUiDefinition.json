@@ -8,7 +8,7 @@
         "type":"Microsoft.Common.DropDown",
         "label":"Database Shop Size",
         "defaultValue":"Small",
-        "toolTip":"The size of Disk virtual machines to use in the cluster. Template version 1.7.5",
+        "toolTip":"The size of Disk virtual machines to use in the cluster. Template version 1.7.6",
         "constraints":{
           "allowedValues":[
             {
@@ -54,8 +54,7 @@
               "required":true
             },
             "options":{
-              "hideConfirmation":false,
-              "hidePassword":true
+              "hideConfirmation":false
             },
             "osPlatform":"Linux"
           }
