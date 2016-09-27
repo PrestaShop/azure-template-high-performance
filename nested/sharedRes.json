@@ -423,7 +423,6 @@
       "type":"Microsoft.Network/loadBalancers",
       "location":"[parameters('location')]",
       "dependsOn":[
-        "[concat('Microsoft.Network/publicIPAddresses/', parameters('scPublicIPAddressName'))]"
       ],
       "properties":{
         "frontendIPConfigurations":[
