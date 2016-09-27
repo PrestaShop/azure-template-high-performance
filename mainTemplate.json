@@ -274,6 +274,7 @@
     "keyStorageAccountType":"Standard_LRS",
     "diagnosticsStorageAccountName": "[concat(uniqueString(resourceGroup().id),'diag')]",
     "diagnosticsStorageAccountType": "Standard_LRS",
+    "hcPublicIPAddressType":"Dynamic",
     "hcNicName":"hcVnic",
     "apiVersion":{
       "resources":{
@@ -297,12 +298,38 @@
     "bkSubnetRoot":"[concat( split(parameters('bkSubnetPrefix'), '.')[0], '.', split(parameters('bkSubnetPrefix'), '.')[1], '.', split(parameters('bkSubnetPrefix'), '.')[2])]"
   },
   "resources":[
+    { "comments":"OK: Public IP for Ansible Control VM (JumpBox)",
+      "apiVersion":"[variables('apiVersion').network]",
+      "type":"Microsoft.Network/publicIPAddresses",
+      "name":"[parameters('hcPublicIPAddressName')]",
+      "location":"[parameters('location')]",
+      "properties":{
+        "publicIPAllocationMethod":"[variables('hcPublicIPAddressType')]",
+        "dnsSettings":{
+          "domainNameLabel":"[parameters('dnsNameForAnsiblePublicIP')]"
+        }
+      }
+    },
+    { "comments":"OK: Public IP for Front Load Balancer",
+      "apiVersion":"[variables('apiVersion').network]",
+      "type":"Microsoft.Network/publicIPAddresses",
+      "name":"[parameters('scPublicIPAddressName')]",
+      "location":"[parameters('location')]",
+      "properties":{
+        "publicIPAllocationMethod":"[variables('scPublicIPAddressType')]",
+        "dnsSettings":{
+          "domainNameLabel":"[parameters('dnsNameForFrontPublicIP')]"
+        }
+      }
+    },
     {
       "comments":"OK: Shared resource deployment",
       "name":"SharedDeployment",
       "type":"Microsoft.Resources/deployments",
       "apiVersion":"[variables('apiVersion').deployment]",
       "dependsOn":[
+        "[concat('Microsoft.Network/publicIPAddresses/', parameters('hcPublicIPAddressName'))]",
+        "[concat('Microsoft.Network/publicIPAddresses/', parameters('scPublicIPAddressName'))]"
       ],
       "properties":{
         "mode":"Incremental",
@@ -379,9 +406,6 @@
           },
           "scPublicIPAddressName":{
             "value":"[parameters('scPublicIPAddressName')]"
-          },
-          "scPublicIPAddressType":{
-            "value":"[variables('scPublicIPAddressType')]"
           },
           "frLBName":{
             "value":"[variables('frLBName')]"
@@ -687,12 +711,12 @@
     }
   ],
   "outputs": {
-    "Ansible FQDN": {
-      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',parameters('hcPublicIPAddressName')), variables('apiVersion').network).dnsSettings.fqdn]",
+    "Ansible_FQDN": {
+      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',parameters('hcPublicIPAddressName')),providers('Microsoft.Network', 'publicIPAddresses').apiVersions[0]).dnsSettings.fqdn]",
       "type": "string"
     },
-    "SHOP FQDN": {
-      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',parameters('scPublicIPAddressName')), variables('apiVersion').network).dnsSettings.fqdn]",
+    "SHOP_FQDN": {
+      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',parameters('scPublicIPAddressName')),providers('Microsoft.Network', 'publicIPAddresses').apiVersions[0]).dnsSettings.fqdn]",
       "type": "string"
     }
   }

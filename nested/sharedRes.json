@@ -144,12 +144,6 @@
         "description": "Public IP address Name for web-front scaleset load balancer VM"
       }
     },
-    "scPublicIPAddressType":{
-      "type":"string",
-      "metadata":{
-        "description":"Type of front LB IP"
-      }
-    },
     "frLBName":{
       "type":"string",
       "metadata":{
@@ -198,7 +192,6 @@
     "bkUpdateDomainCount":"3",
     "scSaCount":5,
     "keyStorageAccountType":"Standard_LRS",
-    "hcPublicIPAddressType":"Dynamic",
     "apiVersion":{
       "resources":{
         "deployments":"2015-01-01"
@@ -375,30 +368,6 @@
       },
       "properties":{
         "accountType":"[parameters('scStorageAccountType')]"
-      }
-    },
-    { "comments":"OK: Public IP for Front Load Balancer",
-      "apiVersion":"[variables('apiVersion').network]",
-      "type":"Microsoft.Network/publicIPAddresses",
-      "name":"[parameters('scPublicIPAddressName')]",
-      "location":"[parameters('location')]",
-      "properties":{
-        "publicIPAllocationMethod":"[parameters('scPublicIPAddressType')]",
-        "dnsSettings":{
-          "domainNameLabel":"[parameters('dnsNameForFrontPublicIP')]"
-        }
-      }
-    },
-    { "comments":"OK: Public IP for Ansible Control VM (JumpBox)",
-      "apiVersion":"[variables('apiVersion').network]",
-      "type":"Microsoft.Network/publicIPAddresses",
-      "name":"[parameters('hcPublicIPAddressName')]",
-      "location":"[parameters('location')]",
-      "properties":{
-        "publicIPAllocationMethod":"[variables('hcPublicIPAddressType')]",
-        "dnsSettings":{
-          "domainNameLabel":"[parameters('dnsNameForAnsiblePublicIP')]"
-        }
       }
     },
     { "comments":"OK: Virtual Network with 3 subnets admin, front, back",
