@@ -8,7 +8,7 @@
         "type":"Microsoft.Common.DropDown",
         "label":"Database Shop Size",
         "defaultValue":"Small",
-        "toolTip":"The size of Disk virtual machines to use in the cluster.",
+        "toolTip":"The size of Disk virtual machines to use in the cluster. Template version 1.7.0",
         "constraints":{
           "allowedValues":[
             {
@@ -305,11 +305,6 @@
                 "Standard_DS13_v2",
                 "Standard_DS14_v2",
                 "Standard_DS15_v2",
-                "Standard_F1",
-                "Standard_F2",
-                "Standard_F4",
-                "Standard_F8",
-                "Standard_F16",
                 "Standard_F1s",
                 "Standard_F2s",
                 "Standard_F4s",
@@ -390,11 +385,6 @@
                 "Standard_DS13_v2",
                 "Standard_DS14_v2",
                 "Standard_DS15_v2",
-                "Standard_F1",
-                "Standard_F2",
-                "Standard_F4",
-                "Standard_F8",
-                "Standard_F16",
                 "Standard_F1s",
                 "Standard_F2s",
                 "Standard_F4s",
@@ -539,11 +529,6 @@
                 "Standard_DS13_v2",
                 "Standard_DS14_v2",
                 "Standard_DS15_v2",
-                "Standard_F1",
-                "Standard_F2",
-                "Standard_F4",
-                "Standard_F8",
-                "Standard_F16",
                 "Standard_F1s",
                 "Standard_F2s",
                 "Standard_F4s",
@@ -640,8 +625,8 @@
             "toolTip":"PrestaShop administrator password",
             "constraints":{
               "required":true,
-              "regex":"^(?:(?=.*[a-z])(?:(?=.*[A-Z])(?=.*[\\d\\W])|(?=.*\\W)(?=.*\\d))|(?=.*\\W)(?=.*[A-Z])(?=.*\\d)).{6,72}$",
-              "validationMessage":"The password must be between 6 and 72 characters long, and contain characters from at least 3 of the following groups: uppercase characters, lowercase characters, numbers, and special characters. regex: ^(?:(?=.*[a-z])(?:(?=.*[A-Z])(?=.*[\\d\\W])|(?=.*\\W)(?=.*\\d))|(?=.*\\W)(?=.*[A-Z])(?=.*\\d)).{6,72}$"
+              "regex":"^[a-zA-Z0-9]{6,72}$",
+              "validationMessage":"The password must be between 6 and 72 characters long and must contains only digits or characters. regex : ^[a-zA-Z0-9]{6,72}$"
             },
             "options":{
               "hideConfirmation":false
