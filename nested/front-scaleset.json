@@ -217,7 +217,16 @@
     "ansibleVarsUrl":"[concat(variables('scriptsBaseUrl'),variables('ansibleVarsLocation'))]",
     "paramsExtra":"[concat(parameters('dnsNameForFrontPublicIP'),'.',resourceGroup().location)]",
     "paramsAdmin":"[concat(parameters('prestashop_password'),'\" \"',parameters('prestashop_firstname'),'\" \"',parameters('prestashop_lastname'),'\" \"',parameters('prestashop_email'))]",
-
+    "apiVersion":{
+      "resources":{
+        "deployments":"2015-01-01"
+      },
+      "network":"2015-06-15",
+      "storage":"2015-06-15",
+      "compute":"2016-03-30",
+      "diag":"2015-06-15",
+      "scale":"2015-04-01"
+    },
     "osProfile_sc_password":{
       "computerName":"[parameters('scVmName')]",
       "adminUsername":"[parameters('adminUsername')]",
@@ -236,20 +245,10 @@
             }
           ]
         }
-      },
-    "apiVersion":{
-      "resources":{
-        "deployments":"2015-01-01"
-      },
-      "network":"2015-06-15",
-      "storage":"2015-06-15",
-      "compute":"2016-03-30",
-      "diag":"2015-06-15",
-      "scale":"2015-04-01"
+      }
     }
   },
   "resources":[
-
     { "comments":"OK: ScaleSet Definition",
       "type":"Microsoft.Compute/virtualMachineScaleSets",
       "name":"[parameters('scVmName')]",
@@ -287,8 +286,7 @@
             },
             "imageReference":"[variables('imageReference')]"
           },
-          "osProfile":"[variables(concat('osProfile_sc_', parameters('authenticationType')))]"
-          },
+          "osProfile":"[variables(concat('osProfile_sc_', parameters('authenticationType')))]",
           "networkProfile":{
             "networkInterfaceConfigurations":[
               {
