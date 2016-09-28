@@ -153,7 +153,7 @@ function get_sshkeys()
         log "Fails to Get id_rsa key trying again ..."
         sleep 60
         let c=${c}+1
-        if [ "${c}" -gt 4 ]; then
+        if [ "${c}" -gt 9 ]; then
            log "Timeout to get id_rsa key exiting ..."
            exit 1
         fi
