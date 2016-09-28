@@ -169,6 +169,20 @@
     }
   },
   "variables":{
+   "linuxConfiguration_sshPublicKey": {
+      "disablePasswordAuthentication": "true",
+      "ssh": {
+        "publicKeys": [
+          {
+            "path": "[variables('sshKeyPath')]",
+            "keyData": "[parameters('sshKeyData')]"
+          }
+        ]
+      }
+    },
+    "linuxConfiguration_password": {},
+    "linuxConfiguration": "[variables(concat('linuxConfiguration_', parameters('authenticationType')))]",
+
     "prestashop_sku":"ubuntu_base_16_04",
     "numberOfFront":"100",
     "scriptsBaseUrl":"[concat(parameters('templatesBaseURL'),'/scripts/')]",
@@ -226,26 +240,6 @@
       "compute":"2016-03-30",
       "diag":"2015-06-15",
       "scale":"2015-04-01"
-    },
-    "osProfile_sc_password":{
-      "computerNamePrefix":"[parameters('scVmName')]",
-      "adminUsername":"[parameters('adminUsername')]",
-      "adminPassword":"[parameters('adminPassword')]"
-    },
-    "osProfile_sc_sshPublicKey":{
-      "computerNamePrefix":"[parameters('scVmName')]",
-      "adminUsername":"[parameters('adminUsername')]",
-      "linuxConfiguration":{
-        "disablePasswordAuthentication":"true",
-        "ssh":{
-          "publicKeys":[
-            {
-              "path":"[variables('sshKeyPath')]",
-              "keyData":"[parameters('sshKeyData')]"
-            }
-          ]
-        }
-      }
     }
   },
   "resources":[
@@ -286,7 +280,12 @@
             },
             "imageReference":"[variables('imageReference')]"
           },
-          "osProfile":"[variables(concat('osProfile_sc_', parameters('authenticationType')))]",
+          "osProfile":{
+            "computerNamePrefix":"[parameters('scVmName')]",
+            "adminUsername":"[parameters('adminUsername')]",
+            "adminPassword":"[parameters('adminPassword')]",
+            "linuxConfiguration": "[variables('linuxConfiguration')]"
+          },
           "networkProfile":{
             "networkInterfaceConfigurations":[
               {

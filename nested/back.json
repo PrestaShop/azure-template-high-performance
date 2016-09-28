@@ -110,6 +110,13 @@
         "description":"Storage Account Name for diags"
       }
     },
+    "authenticationType":{
+      "type":"string",
+      "allowedValues":[
+        "password",
+        "sshPublicKey"
+      ]
+    },
     "location":{
       "type":"string",
       "metadata":{
@@ -118,6 +125,22 @@
     }
   },
   "variables":{
+
+    "linuxConfiguration_sshPublicKey": {
+      "disablePasswordAuthentication": "true",
+      "ssh": {
+        "publicKeys": [
+          {
+            "path": "[variables('sshKeyPath')]",
+            "keyData": "[parameters('sshKeyData')]"
+          }
+        ]
+      }
+    },
+    "linuxConfiguration_password": {},
+    "linuxConfiguration": "[variables(concat('linuxConfiguration_', parameters('authenticationType')))]",
+
+
     "bkVmStorageAccountContainerName":"vhds",
     "sshKeyPath":"[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
     "imagePublisher":"prestashop",
@@ -257,17 +280,7 @@
           "computerName":"[concat(parameters('bkVmName'),copyindex())]",
           "adminUsername":"[parameters('adminUsername')]",
           "adminPassword":"[parameters('adminPassword')]",
-          "linuxConfiguration":{
-            "disablePasswordAuthentication":"true",
-            "ssh":{
-              "publicKeys":[
-                {
-                  "path":"[variables('sshKeyPath')]",
-                  "keyData":"[parameters('sshKeyData')]"
-                }
-              ]
-            }
-          }
+          "linuxConfiguration": "[variables('linuxConfiguration')]"
         },
         "storageProfile":{
           "imageReference":{

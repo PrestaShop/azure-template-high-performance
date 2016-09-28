@@ -709,6 +709,9 @@
           },
            "diagnosticsStorageAccountName":{
             "value":"[variables('diagnosticsStorageAccountName')]"
+          },
+          "authenticationType":{
+            "value":"[parameters('authenticationType')]"
           }
         }
       }
