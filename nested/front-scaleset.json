@@ -228,12 +228,12 @@
       "scale":"2015-04-01"
     },
     "osProfile_sc_password":{
-      "computerName":"[parameters('scVmName')]",
+      "computerNamePrefix":"[parameters('scVmName')]",
       "adminUsername":"[parameters('adminUsername')]",
       "adminPassword":"[parameters('adminPassword')]"
     },
     "osProfile_sc_sshPublicKey":{
-      "computerName":"[parameters('scVmName')]",
+      "computerNamePrefix":"[parameters('scVmName')]",
       "adminUsername":"[parameters('adminUsername')]",
       "linuxConfiguration":{
         "disablePasswordAuthentication":"true",
