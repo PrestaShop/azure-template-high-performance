@@ -332,7 +332,7 @@
           ]
         },
         "protectedSettings":{
-          "commandToExecute":"[concat(variables('customScriptAnsibleCommand'),' \"',parameters('keyStorageAccountName'),'\" \"',listKeys(concat('Microsoft.Storage/storageAccounts/', parameters('keyStorageAccountName')), '2015-05-01-preview').key1,'\" \"',variables('paramsDeploy'),'\"')]"
+          "commandToExecute":"[concat(variables('customScriptAnsibleCommand'),' \"',parameters('keyStorageAccountName'),'\" \"',listKeys(concat('Microsoft.Storage/storageAccounts/', parameters('keyStorageAccountName')), variables('apiVersion').storage).key1,'\" \"',variables('paramsDeploy'),'\"')]"
         }
       }
     },
@@ -360,7 +360,7 @@
           "osDisk":{
             "name":"osdisk",
             "vhd":{
-              "uri":"[concat(reference(concat('Microsoft.Storage/storageAccounts/', parameters('hcStorageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).primaryEndpoints.blob, variables('hcVmStorageAccountContainerName'),'/', variables('hcOSDiskName'), '.vhd')]"
+              "uri":"[concat(reference(concat('Microsoft.Storage/storageAccounts/', parameters('hcStorageAccountName')), variables('apiVersion').storage).primaryEndpoints.blob, variables('hcVmStorageAccountContainerName'),'/', variables('hcOSDiskName'), '.vhd')]"
             },
             "caching":"ReadWrite",
             "createOption":"FromImage"
@@ -398,7 +398,7 @@
         "diagnosticsProfile":{
           "bootDiagnostics":{
             "enabled":"true",
-            "storageUri":"[concat(reference(concat('Microsoft.Storage/storageAccounts/', parameters('diagnosticsStorageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).primaryEndpoints.blob)]"
+            "storageUri":"[concat(reference(concat('Microsoft.Storage/storageAccounts/', parameters('diagnosticsStorageAccountName')), variables('apiVersion').storage).primaryEndpoints.blob)]"
           }
         }
       }
