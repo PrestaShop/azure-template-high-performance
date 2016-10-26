@@ -1,5 +1,5 @@
  {
-  "$schema":"http://schema.management.azure.com/schemas/2015-01-01-preview/deploymentTemplate.json",
+  "$schema":"http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
   "contentVersion":"1.0.0.0",
   "parameters":{
     "templatesBaseURL":{
@@ -331,7 +331,7 @@
                     ]
                   },
                   "protectedSettings":{
-                     "commandToExecute":"[concat(variables('customScriptFrontCommand'),' \"', parameters('keyStorageAccountName'),'\" \"',listKeys(concat('Microsoft.Storage/storageAccounts/', parameters('keyStorageAccountName')), '2015-05-01-preview').key1,'\" \"',parameters('adminUsername'),'\" \"',variables('numberOfFront'),'\" \"',parameters('scSubnetRoot'),'\" \"',parameters('scVmName'),'\" \"',variables('paramsExtra'),'\" \"',variables('paramsAdmin'),'\" \"',parameters('hcSubnetRoot'),'\"')]"
+                     "commandToExecute":"[concat(variables('customScriptFrontCommand'),' \"', parameters('keyStorageAccountName'),'\" \"',listKeys(concat('Microsoft.Storage/storageAccounts/', parameters('keyStorageAccountName')), variables('apiVersion').storage).key1,'\" \"',parameters('adminUsername'),'\" \"',variables('numberOfFront'),'\" \"',parameters('scSubnetRoot'),'\" \"',parameters('scVmName'),'\" \"',variables('paramsExtra'),'\" \"',variables('paramsAdmin'),'\" \"',parameters('hcSubnetRoot'),'\"')]"
                   }
                 }
               },

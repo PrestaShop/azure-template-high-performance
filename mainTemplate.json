@@ -719,11 +719,11 @@
   ],
   "outputs": {
     "Ansible_FQDN": {
-      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',parameters('hcPublicIPAddressName')),providers('Microsoft.Network', 'publicIPAddresses').apiVersions[0]).dnsSettings.fqdn]",
+      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',parameters('hcPublicIPAddressName')), variables('apiVersion').network).dnsSettings.fqdn]",
       "type": "string"
     },
     "SHOP_FQDN": {
-      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',parameters('scPublicIPAddressName')),providers('Microsoft.Network', 'publicIPAddresses').apiVersions[0]).dnsSettings.fqdn]",
+      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',parameters('scPublicIPAddressName')), variables('apiVersion').network).dnsSettings.fqdn]",
       "type": "string"
     }
   }

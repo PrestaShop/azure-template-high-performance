@@ -624,8 +624,8 @@
             "toolTip":"PrestaShop administrator password",
             "constraints":{
               "required":true,
-              "regex":"^[a-zA-Z0-9]{6,72}$",
-              "validationMessage":"The password must be between 6 and 72 characters long and must contains only digits or characters. regex : ^[a-zA-Z0-9]{6,72}$"
+              "regex":"^[a-zA-Z0-9]{12,72}$",
+              "validationMessage":"The password must be between 12 and 72 characters long and must contains only digits or characters. regex : ^[a-zA-Z0-9]{6,72}$"
             },
             "options":{
               "hideConfirmation":false
