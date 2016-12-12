@@ -143,6 +143,15 @@ function put_sshkeys()
 
 }
 
+
+function remove_keys()
+ {
+    # Removes Blob Key
+    log "Remove Blob containing private ssh keys"
+    python RemovePrivateStorage.py "${STORAGE_ACCOUNT_NAME}" "${STORAGE_ACCOUNT_KEY}" id_rsa
+    error_log "Unable to remove container keys storage account ${STORAGE_ACCOUNT_NAME}"
+}
+
 function fix_etc_hosts()
 {
   log "Add hostame and ip in hosts file ..."
@@ -338,6 +347,7 @@ configure_deployment
 create_extra_vars
 deploy_code
 deploy_database_cluster
+remove_keys
 
 
 log "Success : End of Execution of Install Script from CustomScript"
