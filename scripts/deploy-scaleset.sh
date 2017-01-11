@@ -112,14 +112,14 @@ function install_packages()
       log "Lock detected on apt-get while install Try again..."
       sleep 2
     done
-    
+
     log "Install git ..."
     until apt-get --yes install git
     do
       log "Lock detected on apt-get while install Try again..."
       sleep 2
     done
-    
+
     log "Install pip ..."
     until apt-get --yes install python-pip
     do
@@ -169,7 +169,7 @@ function install_ansible()
 
 function get_sshkeys()
  {
-   
+
     c=0;
     log "Install azure storage python module ..."
     pip install azure-storage
@@ -330,6 +330,14 @@ function deploy_scaleset()
   error_log "Fail to deploy scale set node !"
 }
 
+function remove_keys()
+ {
+    # Removes Blob Key
+    log "Remove Blob containing private ssh keys"
+    python RemovePrivateStorage.py "${STORAGE_ACCOUNT_NAME}" "${STORAGE_ACCOUNT_KEY}" id_rsa
+    error_log "Unable to remove container keys storage account ${STORAGE_ACCOUNT_NAME}"
+}
+
 
 
 log "Execution of Install Script from CustomScript ..."
@@ -379,6 +387,7 @@ wait_for_extension
 deploy_nfs_scaleset
 add_host_entry_back
 deploy_scaleset
+remove_keys
 
 # Script Wait for the wait_module from ansible playbook
 #start_nc

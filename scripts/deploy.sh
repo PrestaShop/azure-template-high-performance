@@ -143,15 +143,6 @@ function put_sshkeys()
 
 }
 
-
-function remove_keys()
- {
-    # Removes Blob Key
-    log "Remove Blob containing private ssh keys"
-    python RemovePrivateStorage.py "${STORAGE_ACCOUNT_NAME}" "${STORAGE_ACCOUNT_KEY}" id_rsa
-    error_log "Unable to remove container keys storage account ${STORAGE_ACCOUNT_NAME}"
-}
-
 function fix_etc_hosts()
 {
   log "Add hostame and ip in hosts file ..."
@@ -205,7 +196,7 @@ function configure_ansible()
   if [ "${numberOfBack}" -gt 2 ]; then
   echo "${bkVmName}[1:$nBck] mysql_role=slave ansible_user=${ANSIBLE_USER} ansible_ssh_private_key_file=/home/${ANSIBLE_USER}/.ssh/id_rsa" >> "${ANSIBLE_HOST_FILE}"
   else
-  echo "${bkVmName}1 ansible_user=${ANSIBLE_USER} ansible_ssh_private_key_file=/home/${ANSIBLE_USER}/.ssh/id_rsa"         >> "${ANSIBLE_HOST_FILE}" 
+  echo "${bkVmName}1 ansible_user=${ANSIBLE_USER} ansible_ssh_private_key_file=/home/${ANSIBLE_USER}/.ssh/id_rsa"         >> "${ANSIBLE_HOST_FILE}"
   fi
 
   echo "[master]"                                                                                                                          >> "${ANSIBLE_HOST_FILE}"
@@ -214,7 +205,7 @@ function configure_ansible()
   if [ "${numberOfBack}" -gt 2 ]; then
   echo "${bkVmName}[1:$nBck]"                                                                                                              >> "${ANSIBLE_HOST_FILE}"
   else
-  echo "${bkVmName}1"                                                                                                                      >> "${ANSIBLE_HOST_FILE}" 
+  echo "${bkVmName}1"                                                                                                                      >> "${ANSIBLE_HOST_FILE}"
   fi
 
 }
@@ -347,7 +338,6 @@ configure_deployment
 create_extra_vars
 deploy_code
 deploy_database_cluster
-remove_keys
 
 
 log "Success : End of Execution of Install Script from CustomScript"
