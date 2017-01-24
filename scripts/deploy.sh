@@ -273,13 +273,13 @@ function create_extra_vars()
 
 function deploy_database_cluster()
 {
-  ansible-playbook deploy-prestashop.yml --extra-vars "@${EXTRA_VARS}" > /tmp/ansible-cluster.log 2>&1
+  ansible-playbook deploy-prestashop.yml --extra-vars "@${EXTRA_VARS}" > /var/log/ansible-cluster.log 2>&1
   error_log "Fail to deploy front cluster !"
 }
 
 function deploy_code()
 {
-  ansible-playbook deploy.yml --connection=local -i "localhost," --extra-vars "@${EXTRA_VARS}" > /tmp/ansible-local.log 2>&1
+  ansible-playbook deploy.yml --connection=local -i "localhost," --extra-vars "@${EXTRA_VARS}" > /var/log/ansible-local.log 2>&1
   error_log "Fail to deploy NFS and prestashop code !"
 }
 

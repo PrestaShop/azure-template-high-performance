@@ -307,7 +307,7 @@ function deploy_nfs_scaleset()
 
   log "Deploying NFS ScaleSet..."
 
-  ansible-playbook deploy-scaleset-nfs.yml --connection=local -i "${INVENTORY_FILE}" --extra-vars "@${EXTRA_VARS}" > /tmp/ansible-nfs.log 2>&1
+  ansible-playbook deploy-scaleset-nfs.yml --connection=local -i "${INVENTORY_FILE}" --extra-vars "@${EXTRA_VARS}" > /var/log/ansible-nfs.log 2>&1
   error_log "Fail to deploy NFS scale set node !"
 }
 
@@ -326,7 +326,7 @@ function deploy_scaleset()
 
   log "Deploying ScaleSet..."
 
-  ansible-playbook deploy-scaleset.yml --connection=local -i "${INVENTORY_FILE}" --extra-vars "@${EXTRA_VARS}" > /tmp/ansible.log 2>&1
+  ansible-playbook deploy-scaleset.yml --connection=local -i "${INVENTORY_FILE}" --extra-vars "@${EXTRA_VARS}" > /var/log/ansible.log 2>&1
   error_log "Fail to deploy scale set node !"
 }
 
