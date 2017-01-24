@@ -167,6 +167,9 @@ function configure_ansible()
   # fix ansible bug
   printf "\npipelining = True\n"                                                      >> "${ANSIBLE_CONFIG_FILE}"
 
+  # Handle SSH failures with retry
+  printf "\nretries = 10\n"                                                           >> "${ANSIBLE_CONFIG_FILE}"
+
   let nWeb=${numberOfFront}-1
   let nBck=${numberOfBack}-1
   # Generate Hostfile for Front and Back

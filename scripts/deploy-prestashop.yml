@@ -19,5 +19,5 @@
         mysql_replication_master: "{{ groups['master'][0] }}"
 
   roles:
-    - { role: ansible-init-raid }
-    - { role: ansible-role-mysql }
+    - { role: azure-dep-ansible-init-raid }
+    - { role: azure-dep-ansible-role-mysql }

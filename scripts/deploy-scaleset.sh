@@ -174,8 +174,8 @@ function get_sshkeys()
     log "Install azure storage python module ..."
     pip install azure-storage
 
-    # Push both Private and Public Key
-    log "Push ssh keys to Azure Storage"
+    # Get both Private and Public Key
+    log "Get ssh keys to Azure Storage (id_rsa)"
     until python GetSSHFromPrivateStorage.py "${STORAGE_ACCOUNT_NAME}" "${STORAGE_ACCOUNT_KEY}" id_rsa
     do
         log "Fails to Get id_rsa key trying again ..."
@@ -186,7 +186,18 @@ function get_sshkeys()
            exit 1
         fi
     done
-    python GetSSHFromPrivateStorage.py "${STORAGE_ACCOUNT_NAME}" "${STORAGE_ACCOUNT_KEY}" id_rsa.pub
+
+    log "Get ssh keys to Azure Storage (id_rsa.pub)"
+    until python GetSSHFromPrivateStorage.py "${STORAGE_ACCOUNT_NAME}" "${STORAGE_ACCOUNT_KEY}" id_rsa.pub
+    do
+        log "Fails to Get id_rsa.pub key, trying again ..."
+        sleep 20
+        let c=${c}+1
+        if [ "${c}" -gt 9 ]; then
+           log "Timeout to get id_rsa.pub key, exiting ..."
+           exit 1
+        fi
+    done
     error_log "Fails to Get id_rsa.pub key"
 }
 
@@ -241,6 +252,9 @@ function configure_ansible()
   echo  $'[ssh_connection]\ncontrol_path = ~/.ssh/ansible-%%h-%%r'                    >> "${ANSIBLE_CONFIG_FILE}"
   # fix ansible bug
   printf "\npipelining = True\n"                                                      >> "${ANSIBLE_CONFIG_FILE}"
+
+  # Handle SSH failures with retry
+  printf "\nretries = 10\n"                                                           >> "${ANSIBLE_CONFIG_FILE}"
 
   let nWeb=${numberOfFront}-1
   echo "[front]"                                                                                                                     >> "${ANSIBLE_HOST_FILE}"
