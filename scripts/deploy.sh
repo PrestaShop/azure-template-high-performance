@@ -143,15 +143,6 @@ function put_sshkeys()
 
 }
 
-
-function remove_keys()
- {
-    # Removes Blob Key
-    log "Remove Blob containing private ssh keys"
-    python RemovePrivateStorage.py "${STORAGE_ACCOUNT_NAME}" "${STORAGE_ACCOUNT_KEY}" id_rsa
-    error_log "Unable to remove container keys storage account ${STORAGE_ACCOUNT_NAME}"
-}
-
 function fix_etc_hosts()
 {
   log "Add hostame and ip in hosts file ..."
@@ -175,6 +166,9 @@ function configure_ansible()
   echo  $'[ssh_connection]\ncontrol_path = ~/.ssh/ansible-%%h-%%r'                    >> "${ANSIBLE_CONFIG_FILE}"
   # fix ansible bug
   printf "\npipelining = True\n"                                                      >> "${ANSIBLE_CONFIG_FILE}"
+
+  # Handle SSH failures with retry
+  printf "\nretries = 10\n"                                                           >> "${ANSIBLE_CONFIG_FILE}"
 
   let nWeb=${numberOfFront}-1
   let nBck=${numberOfBack}-1
@@ -205,7 +199,7 @@ function configure_ansible()
   if [ "${numberOfBack}" -gt 2 ]; then
   echo "${bkVmName}[1:$nBck] mysql_role=slave ansible_user=${ANSIBLE_USER} ansible_ssh_private_key_file=/home/${ANSIBLE_USER}/.ssh/id_rsa" >> "${ANSIBLE_HOST_FILE}"
   else
-  echo "${bkVmName}1 ansible_user=${ANSIBLE_USER} ansible_ssh_private_key_file=/home/${ANSIBLE_USER}/.ssh/id_rsa"         >> "${ANSIBLE_HOST_FILE}" 
+  echo "${bkVmName}1 ansible_user=${ANSIBLE_USER} ansible_ssh_private_key_file=/home/${ANSIBLE_USER}/.ssh/id_rsa"         >> "${ANSIBLE_HOST_FILE}"
   fi
 
   echo "[master]"                                                                                                                          >> "${ANSIBLE_HOST_FILE}"
@@ -214,7 +208,7 @@ function configure_ansible()
   if [ "${numberOfBack}" -gt 2 ]; then
   echo "${bkVmName}[1:$nBck]"                                                                                                              >> "${ANSIBLE_HOST_FILE}"
   else
-  echo "${bkVmName}1"                                                                                                                      >> "${ANSIBLE_HOST_FILE}" 
+  echo "${bkVmName}1"                                                                                                                      >> "${ANSIBLE_HOST_FILE}"
   fi
 
 }
@@ -282,13 +276,13 @@ function create_extra_vars()
 
 function deploy_database_cluster()
 {
-  ansible-playbook deploy-prestashop.yml --extra-vars "@${EXTRA_VARS}" > /tmp/ansible-cluster.log 2>&1
+  ansible-playbook deploy-prestashop.yml --extra-vars "@${EXTRA_VARS}" > /var/log/ansible-cluster.log 2>&1
   error_log "Fail to deploy front cluster !"
 }
 
 function deploy_code()
 {
-  ansible-playbook deploy.yml --connection=local -i "localhost," --extra-vars "@${EXTRA_VARS}" > /tmp/ansible-local.log 2>&1
+  ansible-playbook deploy.yml --connection=local -i "localhost," --extra-vars "@${EXTRA_VARS}" > /var/log/ansible-local.log 2>&1
   error_log "Fail to deploy NFS and prestashop code !"
 }
 
@@ -347,7 +341,6 @@ configure_deployment
 create_extra_vars
 deploy_code
 deploy_database_cluster
-remove_keys
 
 
 log "Success : End of Execution of Install Script from CustomScript"

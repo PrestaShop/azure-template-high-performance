@@ -112,14 +112,14 @@ function install_packages()
       log "Lock detected on apt-get while install Try again..."
       sleep 2
     done
-    
+
     log "Install git ..."
     until apt-get --yes install git
     do
       log "Lock detected on apt-get while install Try again..."
       sleep 2
     done
-    
+
     log "Install pip ..."
     until apt-get --yes install python-pip
     do
@@ -169,13 +169,13 @@ function install_ansible()
 
 function get_sshkeys()
  {
-   
+
     c=0;
     log "Install azure storage python module ..."
     pip install azure-storage
 
-    # Push both Private and Public Key
-    log "Push ssh keys to Azure Storage"
+    # Get both Private and Public Key
+    log "Get ssh keys to Azure Storage (id_rsa)"
     until python GetSSHFromPrivateStorage.py "${STORAGE_ACCOUNT_NAME}" "${STORAGE_ACCOUNT_KEY}" id_rsa
     do
         log "Fails to Get id_rsa key trying again ..."
@@ -186,7 +186,18 @@ function get_sshkeys()
            exit 1
         fi
     done
-    python GetSSHFromPrivateStorage.py "${STORAGE_ACCOUNT_NAME}" "${STORAGE_ACCOUNT_KEY}" id_rsa.pub
+
+    log "Get ssh keys to Azure Storage (id_rsa.pub)"
+    until python GetSSHFromPrivateStorage.py "${STORAGE_ACCOUNT_NAME}" "${STORAGE_ACCOUNT_KEY}" id_rsa.pub
+    do
+        log "Fails to Get id_rsa.pub key, trying again ..."
+        sleep 20
+        let c=${c}+1
+        if [ "${c}" -gt 9 ]; then
+           log "Timeout to get id_rsa.pub key, exiting ..."
+           exit 1
+        fi
+    done
     error_log "Fails to Get id_rsa.pub key"
 }
 
@@ -241,6 +252,9 @@ function configure_ansible()
   echo  $'[ssh_connection]\ncontrol_path = ~/.ssh/ansible-%%h-%%r'                    >> "${ANSIBLE_CONFIG_FILE}"
   # fix ansible bug
   printf "\npipelining = True\n"                                                      >> "${ANSIBLE_CONFIG_FILE}"
+
+  # Handle SSH failures with retry
+  printf "\nretries = 10\n"                                                           >> "${ANSIBLE_CONFIG_FILE}"
 
   let nWeb=${numberOfFront}-1
   echo "[front]"                                                                                                                     >> "${ANSIBLE_HOST_FILE}"
@@ -307,7 +321,7 @@ function deploy_nfs_scaleset()
 
   log "Deploying NFS ScaleSet..."
 
-  ansible-playbook deploy-scaleset-nfs.yml --connection=local -i "${INVENTORY_FILE}" --extra-vars "@${EXTRA_VARS}" > /tmp/ansible-nfs.log 2>&1
+  ansible-playbook deploy-scaleset-nfs.yml --connection=local -i "${INVENTORY_FILE}" --extra-vars "@${EXTRA_VARS}" > /var/log/ansible-nfs.log 2>&1
   error_log "Fail to deploy NFS scale set node !"
 }
 
@@ -326,8 +340,16 @@ function deploy_scaleset()
 
   log "Deploying ScaleSet..."
 
-  ansible-playbook deploy-scaleset.yml --connection=local -i "${INVENTORY_FILE}" --extra-vars "@${EXTRA_VARS}" > /tmp/ansible.log 2>&1
+  ansible-playbook deploy-scaleset.yml --connection=local -i "${INVENTORY_FILE}" --extra-vars "@${EXTRA_VARS}" > /var/log/ansible.log 2>&1
   error_log "Fail to deploy scale set node !"
+}
+
+function remove_keys()
+ {
+    # Removes Blob Key
+    log "Remove Blob containing private ssh keys"
+    python RemovePrivateStorage.py "${STORAGE_ACCOUNT_NAME}" "${STORAGE_ACCOUNT_KEY}" id_rsa
+    error_log "Unable to remove container keys storage account ${STORAGE_ACCOUNT_NAME}"
 }
 
 
@@ -379,6 +401,7 @@ wait_for_extension
 deploy_nfs_scaleset
 add_host_entry_back
 deploy_scaleset
+remove_keys
 
 # Script Wait for the wait_module from ansible playbook
 #start_nc

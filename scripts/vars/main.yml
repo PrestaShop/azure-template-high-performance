@@ -81,7 +81,7 @@ data:
     mysql_innodb_flush_log_at_trx_commit: "1"
     mysql_innodb_log_buffer_size: "8M"
     mysql_query_cache_size: "0"
-    
+
 
 mysql_innodb_buffer_pool_size: "{{ data[vmsize].mysql_innodb_buffer_pool_size }}"
 mysql_innodb_log_file_size: "{{ data[vmsize].mysql_innodb_log_file_size }}"
@@ -98,7 +98,7 @@ raid_device: "/dev/md127"
 system_devices: "/dev/sda|/dev/sdb"
 
 
-nfs_exports: 
+nfs_exports:
   - "{{ raid_mountpoint }} *(rw,sync,no_root_squash)"
 
 documentroot: "{{ raid_mountpoint }}/www/azureshop"
@@ -126,10 +126,10 @@ apache_vhosts:
     documentroot: "{{ prestashop_dir }}"
     extra_parameters: |
               ProxyPassMatch ^/(.*\.php(/.*)?)$ "fcgi://127.0.0.1:9000{{ prestashop_dir }}"
-   
+
 apache_mods_enabled:
   - rewrite.load
-  - actions.load 
+  - actions.load
   - alias.load
   - expires.load
 
@@ -161,7 +161,7 @@ php_packages:
   - php7.0-xml
   - php7.0-mbstring
   - php7.0-mysql
-  - php7.0-mcrypt 
+  - php7.0-mcrypt
 
 
 # Localisation
@@ -175,24 +175,22 @@ overwrite_global_mycnf: yes
 
 mysql_replication_user: {name: 'replicator', password: 'prestashop'}
 
-mysql_databases: 
+mysql_databases:
   - name: "{{ prestashop_dbname }}"
     encoding: utf8
     collation: utf8_general_ci
     replicate: 1
-    
-mysql_users: 
+
+mysql_users:
   - name: "{{ prestashop_user }}"
     host: "%"
     password: "{{ prestashop_password }}"
     priv: "{{ prestashop_dbname }}.*:ALL"
- 
-ansistrano_deploy_via: "download_unarchive"    
-ansistrano_get_url: "https://github.com/PrestaShop/azure-template-performance/releases/download/1615/prestashop1615frtar.gz"
+
+ansistrano_deploy_via: "download_unarchive"
+ansistrano_get_url: "https://www.prestashop.com/download/latest#.zip"
 ansistrano_deploy_to: "/{{ raid_mountpoint }}/www/azureshop"
 ansistrano_allow_anonymous_stats: no
 
 lsyncd_directories:
   - "{{ documentroot }}/releases/{{ ansistrano_release_version }}/prestashop"
-  
-  

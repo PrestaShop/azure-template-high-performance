@@ -6,7 +6,7 @@
     - vars/main.yml
 
   roles:
-    - { role: ansible-init-raid } 
+    - { role: azure-dep-ansible-init-raid } 
     - { role: geerlingguy.nfs }
 
 
