@@ -186,6 +186,7 @@
     "prestashop_sku":"ubuntu_base_16_04",
     "numberOfFront":"100",
     "scriptsBaseUrl":"[concat(parameters('templatesBaseURL'),'/scripts/')]",
+    "rmAzureScriptUrl":"[concat(variables('scriptsBaseUrl'),'RemovePrivateStorage.py')]",
     "nicName":"[concat(parameters('scVmName'), 'nic')]",
     "ipConfigName":"[concat(parameters('scVmName'), 'ipconfig')]",
     "sshKeyPath": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
@@ -323,6 +324,7 @@
                   "settings":{
                     "fileUris":[
                       "[concat(variables('scriptsBaseUrl'),'/deploy-scaleset.sh')]",
+                      "[variables('rmAzureScriptUrl')]",
                       "[variables('pythonAzureScriptUrl')]",
                       "[variables('ansiblePlaybookUrl')]",
                       "[variables('ansibleNFSPlaybookUrl')]",
